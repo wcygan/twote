@@ -1,0 +1,19 @@
+[workspace]
+
+members = [
+    "schemas",
+    "twote-api",
+    "twote-frontend"
+]
+
+resolver = "2"
+
+[workspace.dependencies]
+anyhow = "1.0.69"
+tonic = "0.10.0"
+tokio = { version = "1.32.0", features = ["full"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"
+prost = "0.12.0"
+rand = { version = "0.8.5" }
+prost-types = { version = "0.12" }
