@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { HelloRequest } from '../proto/hello_pb.js';
 import { HelloServiceClient } from '../proto/hello_grpc_web_pb.js';
 
-function App() {
+function HelloComponent() {
     const [response, setResponse] = useState('');
 
     const sendRequest = () => {
@@ -30,4 +30,4 @@ function App() {
     );
 }
 
-export default App;
+export default HelloComponent;

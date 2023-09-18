@@ -1,33 +1,22 @@
+use tonic::transport::Server;
+
 use schemas::hello::hello_service_server::HelloServiceServer;
-use schemas::hello::{hello_service_server::HelloService, HelloReply, HelloRequest};
-use tonic::{transport::Server, Request, Response, Status};
-pub struct MyHelloService;
+use schemas::login::login_service_server::LoginServiceServer;
 
-#[tonic::async_trait]
-impl HelloService for MyHelloService {
-    async fn say_hello(
-        &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
-        let greeting = request.into_inner().greeting;
+use crate::service::hello::HelloServiceImpl;
+use crate::service::login::LoginServiceImpl;
 
-        let reply = HelloReply {
-            reply: format!("Hello, {}!", greeting),
-        };
-
-        Ok(Response::new(reply))
-    }
-}
+mod service;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "127.0.0.1:50051".parse()?;
-    let hello_service = MyHelloService;
 
     println!("Running on {}", addr);
 
     Server::builder()
-        .add_service(HelloServiceServer::new(hello_service))
+        .add_service(HelloServiceServer::new(HelloServiceImpl))
+        .add_service(LoginServiceServer::new(LoginServiceImpl))
         .serve(addr)
         .await?;
 
