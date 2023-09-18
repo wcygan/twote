@@ -32,6 +32,8 @@ chmod +x ./scripts/proto.sh && ./scripts/proto.sh
 
 ## Running the app
 
+Run all of these commands in the root directory in separate terminals.
+
 Start the gRPC server:
 
 ```
@@ -47,5 +49,5 @@ envoy -c envoy.yaml
 Start the Javascript server:
 
 ```
-npm start
+cd twote-frontend && npm start
 ```

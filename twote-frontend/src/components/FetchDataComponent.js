@@ -1,27 +1,33 @@
-import React, {useState, useEffect} from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { HelloRequest } from '../proto/hello_pb.js';
+import { HelloServiceClient } from '../proto/hello_grpc_web_pb.js';
 
-function FetchDataComponent() {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+function App() {
+    const [response, setResponse] = useState('');
 
-    useEffect(() => {
-        axios.get('https://api.example.com/data')
-            .then(response => {
-                setData(response.data);
-                setLoading(false);
-            })
-            .catch(error => {
-                setError(error);
-                setLoading(false);
-            });
-    }, []);
+    const sendRequest = () => {
+        const client = new HelloServiceClient("http://localhost:8080");
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error.message}</p>;
+        const request = new HelloRequest();
+        request.setGreeting('Hello from React!');
 
-    return <div>{data.someProperty}</div>; // Adjust based on the structure of your API response
+        client.sayHello(request, {}, (err, response) => {
+            if (err) {
+                console.error(err);
+                setResponse('Error: ' + err.message);
+            } else {
+                console.log(response);
+                setResponse(response.getReply());
+            }
+        });
+    };
+
+    return (
+        <div>
+            <button onClick={sendRequest}>Send gRPC Request</button>
+            <p>Response: {response}</p>
+        </div>
+    );
 }
 
-export default FetchDataComponent;
+export default App;
