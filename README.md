@@ -18,13 +18,7 @@ You will need to install:
 5. [envoy](https://www.envoyproxy.io/docs/envoy/latest/start/install)
     - Envoy is used to proxy the gRPC-Web requests to the gRPC server.
 
-Generate the Rust code from the proto files:
-
-```
-cargo build
-```
-
-Generate the Javascript code from the proto files:
+Generate the Rust & Javascript code from the proto files:
 
 ```
 chmod +x ./scripts/proto.sh && ./scripts/proto.sh
