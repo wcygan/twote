@@ -1,10 +1,13 @@
-import FetchDataComponent from './components/FetchDataComponent';
+import FetchDataComponent from './components/HelloComponent';
+import LoginComponent from './components/LoginComponent';
 
 function App() {
   return (
       <div>
-        <h1>API Data:</h1>
+        <h1>Hello Request:</h1>
         <FetchDataComponent />
+        <h1>Login Request:</h1>
+        <LoginComponent />
       </div>
   );
 }

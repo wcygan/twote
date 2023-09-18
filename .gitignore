@@ -1,3 +1,5 @@
+twote-frontend/src/proto/*
+
 **/target
 **/.DS_Store
 .idea
