@@ -51,3 +51,5 @@ Start the Javascript server:
 ```
 cd twote-frontend && npm start
 ```
+
+Finally, open http://localhost:3000/ in your browser.
