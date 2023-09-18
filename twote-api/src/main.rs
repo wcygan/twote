@@ -24,6 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "127.0.0.1:50051".parse()?;
     let hello_service = MyHelloService;
 
+    println!("Running on {}", addr);
+
     Server::builder()
         .add_service(HelloServiceServer::new(hello_service))
         .serve(addr)
