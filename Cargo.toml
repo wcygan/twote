@@ -3,6 +3,7 @@
 members = [
     "schemas",
     "twote-api",
+    "accounts-backend"
 ]
 
 resolver = "2"

@@ -1,5 +1,6 @@
 use tonic::{Code, Request, Response, Status};
 
+use schemas::login::login_service_client::LoginServiceClient;
 use schemas::login::login_service_server::LoginService;
 use schemas::login::{LoginRequest, LoginResponse};
 
@@ -9,9 +10,12 @@ pub struct LoginServiceImpl;
 impl LoginService for LoginServiceImpl {
     async fn login(
         &self,
-        _request: Request<LoginRequest>,
+        request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
-        let message = format!("not implemented. Sorry {}!", _request.into_inner().username);
-        Err(Status::new(Code::Aborted, message))
+        // TODO: add a LoginServiceImpl constructor that creates a LoginServiceClient
+        match LoginServiceClient::connect("http://localhost:50052").await {
+            Ok(mut client) => client.login(request).await,
+            Err(err) => Err(Status::new(Code::Internal, err.to_string())),
+        }
     }
 }
