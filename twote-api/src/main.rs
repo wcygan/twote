@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Server::builder()
         .add_service(HelloServiceServer::new(HelloServiceImpl))
-        .add_service(LoginServiceServer::new(LoginServiceImpl))
+        .add_service(LoginServiceServer::new(LoginServiceImpl::new().await?))
         .serve(addr)
         .await?;
 
