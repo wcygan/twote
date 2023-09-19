@@ -18,6 +18,10 @@ jobs:
           submodules: true
       - name: Install nightly
         uses: dtolnay/rust-toolchain@nightly
+      - name: Install Tonic tools
+        run: cargo install tonic-build
+      - name: Setup protoc
+        uses: arduino/setup-protobuf@v1
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -38,9 +42,13 @@ jobs:
       - name: Install beta
         if: hashFiles('Cargo.lock') != ''
         uses: dtolnay/rust-toolchain@beta
+      - name: Setup protoc
+        uses: arduino/setup-protobuf@v1
       - name: cargo update
         if: hashFiles('Cargo.lock') != ''
         run: cargo update
+      - name: Install Tonic tools
+        run: cargo install tonic-build
       - name: cargo test
         if: hashFiles('Cargo.lock') != ''
         run: cargo test --locked --all-features
