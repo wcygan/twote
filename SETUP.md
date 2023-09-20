@@ -33,10 +33,16 @@ Also, ensure you have `protoc-gen-js` installed:
 
 ## 4: compile the proto files
 
-Generate the Rust & Javascript code from the proto files:
+Generate the Javascript code from the proto files:
 
 ```
 chmod +x ./scripts/proto.sh && ./scripts/proto.sh
+```
+
+Generate the Rust code from the proto files:
+
+```
+cargo build
 ```
 
 ## 5: Install Docker

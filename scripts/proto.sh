@@ -5,5 +5,3 @@ protoc \
     --js_out=import_style=commonjs,binary:twote-frontend/src/proto \
     --grpc-web_out=import_style=commonjs,mode=grpcwebtext:twote-frontend/src/proto \
     schemas/protos/*.proto
-
-cargo build
