@@ -14,7 +14,6 @@ pub struct LoginServiceImpl {
 impl LoginServiceImpl {
     pub async fn new() -> Result<Self> {
         let client = LoginServiceClient::connect("http://accounts-backend:8082").await?;
-        println!("Connected to accounts-backend!");
         Ok(LoginServiceImpl {
             login_service_clients: Pool::from_vec(vec![client]),
         })
@@ -27,13 +26,7 @@ impl LoginService for LoginServiceImpl {
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
-        println!("LoginService: {:?}", request);
-
         let mut login_service_client = self.login_service_clients.acquire().await;
-        let response = login_service_client.login(request).await;
-
-        println!("LoginService: {:?}", response);
-
-        response
+        login_service_client.login(request).await
     }
 }

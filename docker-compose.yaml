@@ -40,7 +40,7 @@ services:
       - ./schemas:/usr/src/schemas
     healthcheck:
       test: ["CMD", "grpc-health-probe", "-addr=localhost:8082"]
-      interval: 2s
-      timeout: 1s
-      retries: 3
+      interval: 3s
+      timeout: 2s
+      retries: 5
 
