@@ -10,13 +10,13 @@ COPY --from=planner /app/recipe.json recipe.json
 # Install protoc to compile protobuf files
 RUN apt update && apt install -y protobuf-compiler
 # Build dependencies - this is the caching Docker layer!
-RUN cargo chef cook --release --recipe-path recipe.json
+RUN cargo chef cook --recipe-path recipe.json
 # Build application
 COPY . .
-RUN cargo build --release --bin accounts-backend
+RUN cargo build --bin accounts-backend
 
 # We do not need the Rust toolchain to run the binary!
 FROM debian:buster-slim AS runtime
 WORKDIR /app
-COPY --from=builder /app/target/release/accounts-backend /usr/local/bin
+COPY --from=builder /app/target/debug/accounts-backend /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/accounts-backend"]
