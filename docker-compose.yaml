@@ -21,7 +21,8 @@ services:
 
   accounts-backend:
     build:
-      context: ./accounts-backend
+      context: .
+      dockerfile: twote-api/Dockerfile
     ports:
       - "50052:50052"
     volumes:
@@ -29,7 +30,8 @@ services:
 
   twote-api:
     build:
-      context: ./twote-api
+      context: .
+      dockerfile: twote-api/Dockerfile
     ports:
       - "50052:50051"
     depends_on:
