@@ -4,7 +4,7 @@ use tonic::transport::Server;
 
 mod service;
 
-const ADDR: &str = "127.0.0.1:8082";
+const ADDR: &str = "0.0.0.0:8082";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

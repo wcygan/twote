@@ -38,4 +38,9 @@ services:
       - "8082:8082"
     volumes:
       - ./schemas:/usr/src/schemas
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=localhost:8082"]
+      interval: 2s
+      timeout: 1s
+      retries: 3
 

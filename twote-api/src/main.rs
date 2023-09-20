@@ -8,7 +8,7 @@ use crate::service::login::LoginServiceImpl;
 
 mod service;
 
-const ADDR: &str = "127.0.0.1:8081";
+const ADDR: &str = "0.0.0.0:8081";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

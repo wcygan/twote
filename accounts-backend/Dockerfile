@@ -18,5 +18,11 @@ RUN cargo build --bin accounts-backend
 # We do not need the Rust toolchain to run the binary!
 FROM debian:bookworm AS runtime
 WORKDIR /app
+
+# Install wget and ca-certificates to download grpc-health-probe
+RUN apt update && apt install -y wget ca-certificates \
+    && wget -qO/usr/local/bin/grpc-health-probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.5/grpc_health_probe-linux-amd64 \
+    && chmod +x /usr/local/bin/grpc-health-probe
+
 COPY --from=builder /app/target/debug/accounts-backend /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/accounts-backend"]

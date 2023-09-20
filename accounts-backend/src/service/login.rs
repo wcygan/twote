@@ -11,10 +11,12 @@ impl LoginService for LoginServiceImpl {
         &self,
         _request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
+        println!("LoginService: {:?}", _request);
         let message = format!(
             "oops! not implemented! Sorry {}!",
             _request.into_inner().username
         );
+        println!("LoginService: {:?}", message);
         Err(Status::new(Code::Aborted, message))
     }
 }
