@@ -12,6 +12,8 @@ Ensure you have `protoc-gen-grpc-web` installed:
 1. https://github.com/grpc/grpc-web#code-generator-plugin
 2. OR https://formulae.brew.sh/formula/protoc-gen-grpc-web
 
+You will install `protoc-gen-js` later in this guide when `npm` is installed.
+
 ## 2: Install the Rust toolchain
 
 Follow https://www.rust-lang.org/tools/install to install the Rust toolchain.
@@ -24,6 +26,10 @@ manager).
 Follow https://docs.npmjs.com/downloading-and-installing-node-js-and-npm to install `npm`.
 
 After installing `npm`, run `npm install`. This will install of the project's Javascript dependencies.
+
+Also, ensure you have `protoc-gen-js` installed:
+
+`npm i protoc-gen-js`
 
 ## 4: compile the proto files
 
