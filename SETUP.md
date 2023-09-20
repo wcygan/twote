@@ -29,7 +29,7 @@ After installing `npm`, run `npm install`. This will install of the project's Ja
 
 Also, ensure you have `protoc-gen-js` installed:
 
-`npm i protoc-gen-js`
+`npm install -g protoc-gen-js`
 
 ## 4: compile the proto files
 
