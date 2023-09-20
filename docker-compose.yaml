@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  twote-frontend:
+    build:
+      context: ./twote-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - twote-api
+
+  envoy-proxy:
+    image: envoyproxy/envoy:v1.18.3
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - accounts-backend
+      - twote-api
+
+  accounts-backend:
+    build:
+      context: ./accounts-backend
+    ports:
+      - "50052:50052"
+    volumes:
+      - ./schemas:/usr/src/schemas
+
+  twote-api:
+    build:
+      context: ./twote-api
+    ports:
+      - "50052:50051"
+    depends_on:
+      - accounts-backend
+    volumes:
+      - ./schemas:/usr/src/schemas

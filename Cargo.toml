@@ -1,14 +1,10 @@
 [workspace]
-
 members = [
     "schemas",
     "twote-api",
     "accounts-backend"
 ]
-
 resolver = "2"
-
-license = "MIT"
 
 [workspace.dependencies]
 anyhow = "1.0.69"
