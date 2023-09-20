@@ -16,7 +16,7 @@ COPY . .
 RUN cargo build --bin twote-api
 
 # We do not need the Rust toolchain to run the binary!
-FROM debian:buster-slim AS runtime
+FROM debian:bookworm AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/debug/twote-api /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/twote-api"]

@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - twote-api
+      - envoy-proxy
 
   envoy-proxy:
     image: envoyproxy/envoy:v1.18.3
@@ -16,25 +16,26 @@ services:
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
     depends_on:
-      - accounts-backend
       - twote-api
-
-  accounts-backend:
-    build:
-      context: .
-      dockerfile: twote-api/Dockerfile
-    ports:
-      - "50052:50052"
-    volumes:
-      - ./schemas:/usr/src/schemas
 
   twote-api:
     build:
       context: .
       dockerfile: twote-api/Dockerfile
     ports:
-      - "50052:50051"
+      - "8081:8081"
     depends_on:
-      - accounts-backend
+      accounts-backend:
+            condition: service_healthy
     volumes:
       - ./schemas:/usr/src/schemas
+
+  accounts-backend:
+    build:
+      context: .
+      dockerfile: accounts-backend/Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./schemas:/usr/src/schemas
+

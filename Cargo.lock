@@ -9,6 +9,7 @@ dependencies = [
  "schemas",
  "tokio",
  "tonic",
+ "tonic-health",
 ]
 
 [[package]]
@@ -1026,6 +1027,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "tonic-health"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d387f8ad56024274c8d0350f0997dd2dc80f501bcfd27f1df8fd7e558109894c"
+dependencies = [
+ "async-stream",
+ "prost",
+ "tokio",
+ "tokio-stream",
+ "tonic",
+]
+
+[[package]]
 name = "tower"
 version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1113,6 +1127,7 @@ dependencies = [
  "schemas",
  "tokio",
  "tonic",
+ "tonic-health",
  "tub",
 ]
 

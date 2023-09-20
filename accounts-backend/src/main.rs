@@ -4,14 +4,21 @@ use tonic::transport::Server;
 
 mod service;
 
+const ADDR: &str = "127.0.0.1:8082";
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "127.0.0.1:50052".parse()?;
+    let addr = ADDR.parse()?;
 
-    println!("Running on {}", addr);
+    // Create the services
+    let login_service = LoginServiceServer::new(LoginServiceImpl);
+    let (_, health_service) = tonic_health::server::health_reporter();
 
+    // Start the server
+    println!("accounts-backend is running on {}", addr);
     Server::builder()
-        .add_service(LoginServiceServer::new(LoginServiceImpl))
+        .add_service(health_service)
+        .add_service(login_service)
         .serve(addr)
         .await?;
 
