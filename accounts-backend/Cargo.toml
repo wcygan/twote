@@ -1,5 +1,5 @@
 [package]
-name = "twote-api"
+name = "accounts-backend"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,3 @@ edition = "2021"
 schemas = { path = "../schemas" }
 tonic.workspace=true
 tokio.workspace=true
-tub.workspace=true
-anyhow.workspace=true
