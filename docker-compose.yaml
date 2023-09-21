@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  twote-frontend:
+    build:
+      context: .
+      dockerfile: twote-frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - envoy-proxy
+
+  envoy-proxy:
+    image: envoyproxy/envoy:v1.18.3
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    depends_on:
+      - twote-api
+
+  twote-api:
+    build:
+      context: .
+      dockerfile: twote-api/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      accounts-backend:
+            condition: service_healthy
+    volumes:
+      - ./schemas:/usr/src/schemas
+
+  accounts-backend:
+    build:
+      context: .
+      dockerfile: accounts-backend/Dockerfile
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./schemas:/usr/src/schemas
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=localhost:8082"]
+      interval: 3s
+      timeout: 2s
+      retries: 5
+

@@ -13,10 +13,9 @@ pub struct LoginServiceImpl {
 
 impl LoginServiceImpl {
     pub async fn new() -> Result<Self> {
-        let client = LoginServiceClient::connect("http://localhost:50052").await?;
-
+        let client = LoginServiceClient::connect("http://accounts-backend:8082").await?;
         Ok(LoginServiceImpl {
-            login_service_clients: Pool::from_initializer(10, || client.clone()),
+            login_service_clients: Pool::from_vec(vec![client]),
         })
     }
 }

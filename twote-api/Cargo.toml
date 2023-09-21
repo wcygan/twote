@@ -7,6 +7,7 @@ license = "MIT"
 [dependencies]
 schemas = { path = "../schemas" }
 tonic.workspace=true
+tonic-health.workspace=true
 tokio.workspace=true
 tub.workspace=true
 anyhow.workspace=true

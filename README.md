@@ -4,29 +4,16 @@
 
 A social media app where users can post messages and follow other users.
 
-
-## Running the app
+## Local Setup
 
 See [SETUP.md](SETUP.md) for instructions on how to set up the project on your local machine.
 
-Run these commands in the root directory in separate terminals.
+## Running the app
 
-### Start the server
-
-```
-cargo run --bin twote-api
-```
-
-### Start the proxy
+The application runs within Docker. Start it with this command:
 
 ```
-envoy -c envoy.yaml
-```
-
-### Start the client:
-
-```
-cd twote-frontend && npm start
+docker-compose up -d
 ```
 
 Next, open http://localhost:3000/ in your browser.

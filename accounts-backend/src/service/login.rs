@@ -9,11 +9,11 @@ pub struct LoginServiceImpl;
 impl LoginService for LoginServiceImpl {
     async fn login(
         &self,
-        _request: Request<LoginRequest>,
+        request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
         let message = format!(
             "oops! not implemented! Sorry {}!",
-            _request.into_inner().username
+            request.into_inner().username
         );
         Err(Status::new(Code::Aborted, message))
     }
