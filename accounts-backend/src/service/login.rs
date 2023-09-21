@@ -1,5 +1,5 @@
 use tonic::{Code, Request, Response, Status};
-use tracing::{event, info};
+use tracing::{info};
 
 use schemas::login::login_service_server::LoginService;
 use schemas::login::{LoginRequest, LoginResponse};
@@ -13,7 +13,7 @@ impl LoginService for LoginServiceImpl {
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
-        info!("accounts-backend/login");
+        info!("Processing LoginRequest");
         let message = format!(
             "oops! not implemented! Sorry {}!",
             request.into_inner().username

@@ -12,7 +12,7 @@ impl HelloService for HelloServiceImpl {
         &self,
         request: Request<HelloRequest>,
     ) -> Result<Response<HelloReply>, Status> {
-        info!("twote-api/hello");
+        info!("Processing HelloRequest");
         let greeting = request.into_inner().greeting;
 
         let reply = HelloReply {

@@ -28,7 +28,7 @@ impl LoginService for LoginServiceImpl {
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
-        info!("twote-api/login");
+        info!("Processing LoginRequest");
         let mut login_service_client = self.login_service_clients.acquire().await;
         login_service_client.login(request).await
     }
