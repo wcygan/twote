@@ -1,6 +1,7 @@
 use anyhow::Result;
 use tonic::transport::Channel;
 use tonic::{Request, Response, Status};
+use tracing::info;
 use tub::Pool;
 
 use schemas::login::login_service_client::LoginServiceClient;
@@ -22,10 +23,12 @@ impl LoginServiceImpl {
 
 #[tonic::async_trait]
 impl LoginService for LoginServiceImpl {
+    #[tracing::instrument(skip(self))]
     async fn login(
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
+        info!("twote-api/login");
         let mut login_service_client = self.login_service_clients.acquire().await;
         login_service_client.login(request).await
     }

@@ -8,6 +8,9 @@ const ADDR: &str = "0.0.0.0:8082";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .init();
     let addr = ADDR.parse()?;
 
     // Create the services
