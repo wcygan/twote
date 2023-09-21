@@ -8,6 +8,8 @@ members = [
 
 resolver = "2"
 
+license = "MIT"
+
 [workspace.dependencies]
 anyhow = "1.0.69"
 tonic = "0.10.0"

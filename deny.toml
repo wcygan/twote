@@ -1,0 +1,43 @@
+all-features = true
+
+[bans]
+multiple-versions = "deny"
+deny = [
+    # color-backtrace  brings in too many dependencies and that are often outdated
+    { name = "color-backtrace" },
+
+    # dirs crate has a lot of dependencies and there are better alternatives
+    { name = "dirs" },
+    { name = "dirs-sys" },
+
+    # deprecated
+    { name = "quickersort" },
+
+    # term is not fully maintained, and termcolor is replacing it
+    { name = "term" },
+]
+skip-tree = [
+    { name = "windows-sys" },
+    { name = "hermit-abi" },
+    { name = "base64" },
+    { name = "syn" },
+    { name = "bitflags" },
+    { name = "socket2" },
+    { name = "indexmap" },
+]
+
+[licenses]
+unlicensed = "deny"
+# We want really high confidence when inferring licenses from text
+confidence-threshold = 0.92
+copyleft = "deny"
+allow = [
+    "Apache-2.0",
+    "ISC",
+    "MIT",
+    "OpenSSL",
+    "Zlib",
+    "Unicode-DFS-2016",
+    "MPL-2.0",
+    "BSD-3-Clause"
+]
