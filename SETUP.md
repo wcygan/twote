@@ -39,9 +39,15 @@ manager).
 
 Follow https://docs.npmjs.com/downloading-and-installing-node-js-and-npm to install `npm`.
 
-After installing `npm`, run `npm install`. This will install of the project's Javascript dependencies.
+After installing `npm`, run `npm install` within the `twote-frontend` directory. This will install of the project's Javascript dependencies.
 
 ## 4: compile the proto files
+
+Generate the Rust code from the proto files:
+
+```
+cargo build
+```
 
 Generate the Javascript code from the proto files:
 
@@ -49,11 +55,7 @@ Generate the Javascript code from the proto files:
 chmod +x ./scripts/proto.sh && ./scripts/proto.sh
 ```
 
-Generate the Rust code from the proto files:
-
-```
-cargo build
-```
+or use `.\scripts\proto.ps1` on Windows.
 
 ## 5: Install Docker
 
