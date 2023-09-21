@@ -1,6 +1,19 @@
 Follow these instructions to set up the project on your local machine. You will install dependencies & compile `.proto`
 files so they can be indexed by your IDE.
 
+## 0: Prelude: Downloading binaries to Windows
+
+If there is no fancy installation method & you can only download a binary, download your binaries & move them into a path like `C:\bin`.
+
+Then add `C:\bin` to your path 
+
+Apply your new settings & reload your terminal with `. $PROFILE` (or completely restart your terminal)
+
+| Releases | `C:\bin`                | System Path Variable     |
+|----------|---------------------|--------------------------|
+| ![img_2.png](img_2.png)         | ![img.png](img.png) | ![img_1.png](img_1.png)  |
+
+
 ## 1: Install protocol buffers
 
 Ensure you have `protoc` installed:
@@ -9,10 +22,11 @@ Ensure you have `protoc` installed:
 
 Ensure you have `protoc-gen-grpc-web` installed:
 
-1. https://github.com/grpc/grpc-web#code-generator-plugin
-2. OR https://formulae.brew.sh/formula/protoc-gen-grpc-web
+1. https://github.com/grpc/grpc-web/releases
 
-You will install `protoc-gen-js` later in this guide when `npm` is installed.
+Ensure you have `protoc-gen-js` installed:
+
+1. https://github.com/protocolbuffers/protobuf-javascript/releases
 
 ## 2: Install the Rust toolchain
 
@@ -26,10 +40,6 @@ manager).
 Follow https://docs.npmjs.com/downloading-and-installing-node-js-and-npm to install `npm`.
 
 After installing `npm`, run `npm install`. This will install of the project's Javascript dependencies.
-
-Also, ensure you have `protoc-gen-js` installed:
-
-`npm install -g protoc-gen-js`
 
 ## 4: compile the proto files
 
