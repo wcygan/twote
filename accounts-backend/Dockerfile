@@ -16,7 +16,9 @@ RUN apt update && apt install -y protobuf-compiler
 # Build dependencies - this is the caching Docker layer!
 RUN cargo chef cook --recipe-path recipe.json
 # Build application
-COPY . .
+COPY common/ /app/common/
+COPY schemas/ /app/schemas/
+COPY accounts-backend/ /app/accounts-backend/
 RUN cargo build --bin accounts-backend
 
 # We do not need the Rust toolchain to run the binary!
