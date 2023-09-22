@@ -1,24 +1,11 @@
 use anyhow::Result;
-use tonic::transport::Channel;
-use tonic::{Request, Response, Status};
-use tub::Pool;
-
+use common::Service::AccountsBackend;
 use schemas::login::login_service_client::LoginServiceClient;
 use schemas::login::login_service_server::LoginService;
 use schemas::login::{LoginRequest, LoginResponse};
+use tonic::{Request, Response, Status};
 
-pub struct LoginServiceImpl {
-    login_service_clients: Pool<LoginServiceClient<Channel>>,
-}
-
-impl LoginServiceImpl {
-    pub async fn new() -> Result<Self> {
-        let client = LoginServiceClient::connect("http://accounts-backend:8082").await?;
-        Ok(LoginServiceImpl {
-            login_service_clients: Pool::from_vec(vec![client]),
-        })
-    }
-}
+pub struct LoginServiceImpl;
 
 #[tonic::async_trait]
 impl LoginService for LoginServiceImpl {
@@ -26,7 +13,10 @@ impl LoginService for LoginServiceImpl {
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
-        let mut login_service_client = self.login_service_clients.acquire().await;
-        login_service_client.login(request).await
+        LoginServiceClient::connect(AccountsBackend.addr())
+            .await
+            .map_err(|e| Status::new(tonic::Code::Internal, e.to_string()))?
+            .login(request)
+            .await
     }
 }

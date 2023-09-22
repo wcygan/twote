@@ -1,14 +1,13 @@
 use crate::service::login::LoginServiceImpl;
+use common::Service::AccountsBackend;
 use schemas::login::login_service_server::LoginServiceServer;
 use tonic::transport::Server;
 
 mod service;
 
-const ADDR: &str = "0.0.0.0:8082";
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = ADDR.parse()?;
+    let addr = AccountsBackend.socket_addr();
 
     // Create the services
     let login_service = LoginServiceServer::new(LoginServiceImpl);

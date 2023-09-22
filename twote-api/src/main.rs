@@ -1,21 +1,19 @@
-use tonic::transport::Server;
-
+use common::Service::TwoteApi;
 use schemas::hello::hello_service_server::HelloServiceServer;
 use schemas::login::login_service_server::LoginServiceServer;
+use tonic::transport::Server;
 
 use crate::service::hello::HelloServiceImpl;
 use crate::service::login::LoginServiceImpl;
 
 mod service;
 
-const ADDR: &str = "0.0.0.0:8081";
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = ADDR.parse()?;
+    let addr = TwoteApi.socket_addr();
 
     // Create the services
-    let login_service = LoginServiceServer::new(LoginServiceImpl::new().await?);
+    let login_service = LoginServiceServer::new(LoginServiceImpl);
     let hello_service = HelloServiceServer::new(HelloServiceImpl);
     let (_, health_service) = tonic_health::server::health_reporter();
 
