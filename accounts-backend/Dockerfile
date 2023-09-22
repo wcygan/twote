@@ -2,7 +2,11 @@ FROM lukemathwalker/cargo-chef:latest-rust-1.72 AS chef
 WORKDIR /app
 
 FROM chef AS planner
-COPY . .
+COPY Cargo.toml /app/Cargo.toml
+COPY common/Cargo.toml /app/common/Cargo.toml
+COPY schemas/Cargo.toml /app/schemas/Cargo.toml
+COPY twote-api/Cargo.toml /app/twote-api/Cargo.toml
+COPY accounts-backend/Cargo.toml /app/accounts-backend/Cargo.toml
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
