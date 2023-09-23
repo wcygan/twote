@@ -27,9 +27,9 @@ impl AccountService for AccountServiceImpl {
         &self,
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
-        info!("Processing LoginRequest");
+        info!("Processing CreateAccountRequest");
         let message = format!(
-            "oops! not implemented! Sorry {}!",
+            "oops! not implemented! Sorry {}bot!",
             request.into_inner().username
         );
         Err(Status::new(Code::Aborted, message))
