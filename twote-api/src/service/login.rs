@@ -21,7 +21,7 @@ impl AccountService for AccountServiceImpl {
         info!("Processing LoginRequest");
         AccountServiceClient::connect(AccountsBackend.addr())
             .await
-            .map_err(|e| Status::new(tonic::Code::Internal, e.to_string()))?
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?
             .login(request)
             .await
     }
@@ -31,11 +31,11 @@ impl AccountService for AccountServiceImpl {
         &self,
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
-        info!("Processing LoginRequest");
-        let message = format!(
-            "oops! not implemented! Sorry {}!",
-            request.into_inner().username
-        );
-        Err(Status::new(Code::Aborted, message))
+        info!("Processing CreateAccountRequest");
+        AccountServiceClient::connect(AccountsBackend.addr())
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?
+            .create_account(request)
+            .await
     }
 }
