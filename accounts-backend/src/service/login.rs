@@ -1,13 +1,13 @@
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
 
-use schemas::account::login_service_server::LoginService;
+use schemas::account::account_service_server::AccountService;
 use schemas::account::{LoginRequest, LoginResponse};
 
-pub struct LoginServiceImpl;
+pub struct AccountServiceImpl;
 
 #[tonic::async_trait]
-impl LoginService for LoginServiceImpl {
+impl AccountService for AccountServiceImpl {
     #[tracing::instrument(skip(self))]
     async fn login(
         &self,

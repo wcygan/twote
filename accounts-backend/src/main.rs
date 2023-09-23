@@ -1,6 +1,6 @@
-use crate::service::login::LoginServiceImpl;
+use crate::service::login::AccountServiceImpl;
 use common::Service::AccountsBackend;
-use schemas::account::login_service_server::LoginServiceServer;
+use schemas::account::account_service_server::AccountServiceServer;
 use tonic::transport::Server;
 
 mod service;
@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = AccountsBackend.socket_addr();
 
     // Create the services
-    let login_service = LoginServiceServer::new(LoginServiceImpl);
+    let login_service = AccountServiceServer::new(AccountServiceImpl);
     let (_, health_service) = tonic_health::server::health_reporter();
 
     // Start the server

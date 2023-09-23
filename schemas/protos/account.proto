@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package account;
 
-service LoginService {
+service AccountService {
   rpc Login(LoginRequest) returns (LoginResponse);
 }
 
