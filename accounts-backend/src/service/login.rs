@@ -1,8 +1,9 @@
+use schemas::account::account_service_server::AccountService;
+use schemas::account::CreateAccountRequest;
+use schemas::account::CreateAccountResponse;
+use schemas::account::{LoginRequest, LoginResponse};
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
-
-use schemas::account::account_service_server::AccountService;
-use schemas::account::{LoginRequest, LoginResponse};
 
 pub struct AccountServiceImpl;
 
@@ -13,6 +14,19 @@ impl AccountService for AccountServiceImpl {
         &self,
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
+        info!("Processing LoginRequest");
+        let message = format!(
+            "oops! not implemented! Sorry {}!",
+            request.into_inner().username
+        );
+        Err(Status::new(Code::Aborted, message))
+    }
+
+    #[tracing::instrument(skip(self))]
+    async fn create_account(
+        &self,
+        request: Request<CreateAccountRequest>,
+    ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing LoginRequest");
         let message = format!(
             "oops! not implemented! Sorry {}!",
