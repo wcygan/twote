@@ -2,10 +2,19 @@ use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
 use schemas::account::CreateAccountResponse;
 use schemas::account::{LoginRequest, LoginResponse};
+use sqlx::PgPool;
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
 
-pub struct AccountServiceImpl;
+pub struct AccountServiceImpl {
+    pool: PgPool,
+}
+
+impl AccountServiceImpl {
+    pub fn new(pool: PgPool) -> Self {
+        Self { pool }
+    }
+}
 
 #[tonic::async_trait]
 impl AccountService for AccountServiceImpl {

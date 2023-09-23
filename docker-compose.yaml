@@ -39,6 +39,9 @@ services:
       - "8082:8082"
     volumes:
       - ./schemas:/usr/src/schemas
+    depends_on:
+      accounts-db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "grpc-health-probe", "-addr=localhost:8082"]
       interval: 3s

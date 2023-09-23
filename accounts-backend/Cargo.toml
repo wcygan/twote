@@ -16,3 +16,4 @@ common = { path = "../common" }
 tonic.workspace=true
 tonic-health.workspace=true
 tokio.workspace=true
+sqlx.workspace=true
