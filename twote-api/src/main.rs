@@ -1,6 +1,6 @@
 use common::Service::TwoteApi;
 use schemas::hello::hello_service_server::HelloServiceServer;
-use schemas::login::login_service_server::LoginServiceServer;
+use schemas::account::login_service_server::LoginServiceServer;
 use tonic::transport::Server;
 
 use crate::service::hello::HelloServiceImpl;

@@ -1,8 +1,8 @@
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
 
-use schemas::login::login_service_server::LoginService;
-use schemas::login::{LoginRequest, LoginResponse};
+use schemas::account::login_service_server::LoginService;
+use schemas::account::{LoginRequest, LoginResponse};
 
 pub struct LoginServiceImpl;
 

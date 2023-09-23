@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package login;
+package account;
 
 service LoginService {
   rpc Login(LoginRequest) returns (LoginResponse);

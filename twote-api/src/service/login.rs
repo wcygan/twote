@@ -1,8 +1,8 @@
 use anyhow::Result;
 use common::Service::AccountsBackend;
-use schemas::login::login_service_client::LoginServiceClient;
-use schemas::login::login_service_server::LoginService;
-use schemas::login::{LoginRequest, LoginResponse};
+use schemas::account::login_service_client::LoginServiceClient;
+use schemas::account::login_service_server::LoginService;
+use schemas::account::{LoginRequest, LoginResponse};
 use tonic::{Request, Response, Status};
 use tracing::info;
 

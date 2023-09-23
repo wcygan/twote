@@ -1,6 +1,6 @@
 use crate::service::login::LoginServiceImpl;
 use common::Service::AccountsBackend;
-use schemas::login::login_service_server::LoginServiceServer;
+use schemas::account::login_service_server::LoginServiceServer;
 use tonic::transport::Server;
 
 mod service;
