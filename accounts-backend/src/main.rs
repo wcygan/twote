@@ -2,6 +2,7 @@ use crate::service::login::AccountServiceImpl;
 use common::Service::AccountsBackend;
 use schemas::account::account_service_server::AccountServiceServer;
 use sqlx::postgres::PgPoolOptions;
+use std::env;
 use tonic::transport::Server;
 
 mod service;
@@ -15,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create a database connection pool
     let pool = PgPoolOptions::new()
-        .connect("postgres://myuser:mypassword@localhost/mydatabase")
+        .connect(env::var("DATABASE_URL").unwrap().as_str())
         .await?;
 
     // Create the services

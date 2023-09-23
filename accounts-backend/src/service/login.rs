@@ -24,6 +24,16 @@ impl AccountService for AccountServiceImpl {
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
         info!("Processing LoginRequest");
+
+        // Run the query
+        let mut query = sqlx::query!(
+            r#"
+        SELECT user_id, username, password
+        FROM users
+        "#
+        )
+        .fetch(&self.pool);
+
         let message = format!(
             "oops! not implemented! Sorry {}!",
             request.into_inner().username

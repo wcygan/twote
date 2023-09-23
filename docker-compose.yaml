@@ -39,6 +39,8 @@ services:
       - "8082:8082"
     volumes:
       - ./schemas:/usr/src/schemas
+    environment:
+      DATABASE_URL: "postgres://myuser:mypassword@accounts-db/mydatabase"
     depends_on:
       accounts-db:
         condition: service_healthy
