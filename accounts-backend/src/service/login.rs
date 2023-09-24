@@ -1,5 +1,6 @@
+use anyhow::Context;
 use argon2::password_hash::SaltString;
-use argon2::{Algorithm, Argon2, Params, PasswordHasher, Version};
+use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
 use schemas::account::CreateAccountResponse;
@@ -109,9 +110,10 @@ impl AccountServiceImpl {
     }
 }
 
+#[tracing::instrument(name = "Create account data", skip(request))]
 fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account, Status> {
     // Validate the credentials provided by the user
-    let credentials = validate_credentials(request.into_inner())?;
+    let credentials = validate_new_credentials(request.into_inner())?;
 
     // Hash the password with salt
     let salt = SaltString::generate(&mut rand::thread_rng());
@@ -135,7 +137,8 @@ fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account
     Ok(account)
 }
 
-fn validate_credentials(request: CreateAccountRequest) -> Result<LoginData, Status> {
+#[tracing::instrument(name = "Validate credentials", skip(request))]
+fn validate_new_credentials(request: CreateAccountRequest) -> Result<LoginData, Status> {
     let u = LoginData {
         username: request.username,
         password: request.password,
@@ -145,4 +148,30 @@ fn validate_credentials(request: CreateAccountRequest) -> Result<LoginData, Stat
         .map_err(|e| Status::new(Code::InvalidArgument, e.to_string()))?;
 
     Ok(u)
+}
+
+#[tracing::instrument(
+    name = "Verify password hash",
+    skip(expected_password_hash, password_candidate)
+)]
+fn verify_password_hash(
+    expected_password_hash: String,
+    password_candidate: String,
+) -> Result<(), AuthError> {
+    let expected_password_hash = PasswordHash::new(expected_password_hash.as_str())
+        .context("Failed to parse hash in PHC string format.")
+        .map_err(AuthError::UnexpectedError)?;
+
+    Argon2::default()
+        .verify_password(password_candidate.as_bytes(), &expected_password_hash)
+        .context("Invalid password.")
+        .map_err(AuthError::InvalidCredentials)
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum AuthError {
+    #[error("Invalid credentials.")]
+    InvalidCredentials(#[source] anyhow::Error),
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
 }

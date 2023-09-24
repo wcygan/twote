@@ -6,11 +6,13 @@ version = 3
 name = "accounts-backend"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "argon2",
  "common",
  "rand",
  "schemas",
  "sqlx",
+ "thiserror",
  "tokio",
  "tonic",
  "tonic-health",
