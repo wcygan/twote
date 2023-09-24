@@ -25,7 +25,6 @@ struct Account {
     user_id: Uuid,
     username: String,
     password_hash: String,
-    salt: String,
 }
 
 pub struct AccountServiceImpl {
@@ -75,12 +74,11 @@ impl AccountServiceImpl {
         data: Account,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         sqlx::query!(
-            "INSERT INTO users (user_id, username, password_hash, salt)
-            VALUES ($1, $2, $3, $4)",
+            "INSERT INTO users (user_id, username, password_hash)
+            VALUES ($1, $2, $3)",
             data.user_id,
             data.username,
             data.password_hash,
-            data.salt,
         )
         .execute(&self.pool)
         .await
@@ -93,23 +91,25 @@ impl AccountServiceImpl {
         &self,
         data: LoginData,
     ) -> Result<Response<LoginResponse>, Status> {
-        let (_, stored_password_hash, _) = self.get_credentials(&data).await?;
+        let (user_id, stored_password_hash) = self.get_credentials(&data).await?;
 
         verify_password_hash(stored_password_hash, data.password)
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
-        // TODO: Persist this token in redis
+        // TODO: Persist this KV in redis
         let token = Uuid::new_v4().to_string();
+
+        let (_key, _value) = (token.clone(), user_id);
 
         Ok(Response::new(LoginResponse { token }))
     }
 
     #[tracing::instrument(name = "Get credentials", skip(self))]
-    async fn get_credentials(&self, data: &LoginData) -> Result<(Uuid, String, String), Status> {
+    async fn get_credentials(&self, data: &LoginData) -> Result<(Uuid, String), Status> {
         sqlx::query!(
             r#"
-            SELECT user_id, password_hash, salt
+            SELECT user_id, password_hash
             FROM users
             WHERE username = $1
             "#,
@@ -119,7 +119,7 @@ impl AccountServiceImpl {
         .await
         .map_or(
             Err(Status::new(Code::Internal, "Credentials not found")),
-            |row| Ok((row.user_id, row.password_hash, row.salt)),
+            |row| Ok((row.user_id, row.password_hash)),
         )
     }
 }
@@ -131,7 +131,6 @@ async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<A
 
     // Hash the password with salt
     let salt = SaltString::generate(&mut rand::thread_rng());
-    let salt_strig = salt.to_string();
     let password_hash = compute_password_hash(credentials.password, salt)
         .await
         .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
@@ -141,7 +140,6 @@ async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<A
         user_id: Uuid::new_v4(),
         username: credentials.username,
         password_hash,
-        salt: salt_strig,
     };
 
     Ok(account)
@@ -205,7 +203,7 @@ mod test {
     async fn password_hash_computation() {
         let password = "password".to_string();
         let salt = SaltString::generate(&mut rand::thread_rng());
-        let salt_string = salt.to_string();
+        let _salt_string = salt.to_string();
         let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
         assert_ne!(password_hash, password);
     }
@@ -214,7 +212,7 @@ mod test {
     async fn password_verification_success() {
         let password = "password".to_string();
         let salt = SaltString::generate(&mut rand::thread_rng());
-        let salt_string = salt.to_string();
+        let _salt_string = salt.to_string();
         let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
         let result = verify_password_hash(password_hash, password).await;
         assert!(result.is_ok());
@@ -224,7 +222,7 @@ mod test {
     async fn password_verification_failure() {
         let password = "password".to_string();
         let salt = SaltString::generate(&mut rand::thread_rng());
-        let salt_string = salt.to_string();
+        let _salt_string = salt.to_string();
         let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
         let result = verify_password_hash(password_hash, "foobar".to_string()).await;
         assert!(result.is_err());
