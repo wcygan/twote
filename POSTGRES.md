@@ -37,3 +37,10 @@ sqlx migrate add <migration-name>
 
 Note: make sure that migrations happen within the associated backend directory. For example, migrations for `account-db` should occur in the `accounts-backend` directory.
 
+## Prepared Queries
+
+See [Offline Mode in sqlx](https://docs.rs/sqlx/latest/sqlx/macro.query.html#offline-mode-requires-the-offline-feature)
+
+```
+cargo sqlx prepare --database-url postgres://myuser:mypassword@localhost/mydatabase --workspace
+```

@@ -5,6 +5,7 @@ use schemas::account::{LoginRequest, LoginResponse};
 use sqlx::PgPool;
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
+use uuid::Uuid;
 
 pub struct AccountServiceImpl {
     pool: PgPool,
@@ -19,6 +20,16 @@ impl AccountServiceImpl {
         &self,
         req: CreateAccountRequest,
     ) -> Result<Response<CreateAccountResponse>, Status> {
+        sqlx::query!(
+            "INSERT INTO users (user_id, username, password)
+            VALUES ($1, $2, $3)",
+            Uuid::new_v4(),
+            req.username,
+            req.password,
+        )
+        .execute(&self.pool)
+        .await
+        .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))?;
         let message = format!("oops! not implemented! Sorrybot!");
         Err(Status::new(Code::Aborted, message))
     }
