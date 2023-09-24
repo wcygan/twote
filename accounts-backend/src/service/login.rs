@@ -29,9 +29,8 @@ impl AccountServiceImpl {
         )
         .execute(&self.pool)
         .await
-        .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))?;
-        let message = format!("oops! not implemented! Sorrybot!");
-        Err(Status::new(Code::Aborted, message))
+        .map(|_| Response::new(CreateAccountResponse {}))
+        .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
     }
 }
 
