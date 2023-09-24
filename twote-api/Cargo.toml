@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
+[[bin]]
+name = "twote-api"
+path = "src/main.rs"
+
 [dependencies]
 schemas = { path = "../schemas" }
 tracing.workspace=true

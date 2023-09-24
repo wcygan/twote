@@ -55,8 +55,6 @@ Generate the Javascript code from the proto files:
 chmod +x ./scripts/proto.sh && ./scripts/proto.sh
 ```
 
-or use `.\scripts\proto.ps1` on Windows.
-
 ## 5: Install Docker
 
 Ensure you have `docker` and `docker-compose` installed.
