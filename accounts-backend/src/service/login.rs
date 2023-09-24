@@ -25,8 +25,8 @@ impl AccountServiceImpl {
         // VALUES ($1, $2)
         // ON CONFLICT (email) DO NOTHING
         // "#,
-        //     name,
-        //     email
+        //     req.username,
+        //     req.password
         // )
         // .execute(&self.pool)
         // .await;
