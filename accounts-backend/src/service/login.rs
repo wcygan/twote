@@ -40,11 +40,17 @@ impl AccountService for AccountServiceImpl {
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
         info!("Processing LoginRequest");
-        let message = format!(
-            "oops! not implemented! Sorry {}!",
-            request.into_inner().username
-        );
-        Err(Status::new(Code::Aborted, message))
+        let req = request.into_inner();
+
+        let data = LoginData {
+            username: req.username,
+            password: req.password,
+        };
+
+        data.validate()
+            .map_err(|e| Status::new(Code::InvalidArgument, e.to_string()))?;
+
+        self.validate_credentials(data).await
     }
 
     #[tracing::instrument(skip(self))]
@@ -87,13 +93,9 @@ impl AccountServiceImpl {
         &self,
         data: LoginData,
     ) -> Result<Response<LoginResponse>, Status> {
-        let (_, stored_password_hash, stored_salt) = self.get_credentials(&data).await?;
+        let (_, stored_password_hash, _) = self.get_credentials(&data).await?;
 
-        let candidate_password_hash = compute_password_hash(data.password, stored_salt)
-            .await
-            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
-
-        verify_password_hash(stored_password_hash, candidate_password_hash)
+        verify_password_hash(stored_password_hash, data.password)
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
@@ -129,7 +131,8 @@ async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<A
 
     // Hash the password with salt
     let salt = SaltString::generate(&mut rand::thread_rng());
-    let password_hash = compute_password_hash(credentials.password, salt.to_string())
+    let salt_strig = salt.to_string();
+    let password_hash = compute_password_hash(credentials.password, salt)
         .await
         .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
@@ -138,7 +141,7 @@ async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<A
         user_id: Uuid::new_v4(),
         username: credentials.username,
         password_hash,
-        salt: salt.to_string(),
+        salt: salt_strig,
     };
 
     Ok(account)
@@ -158,9 +161,11 @@ fn validate_new_credentials(request: CreateAccountRequest) -> Result<LoginData, 
 }
 
 #[tracing::instrument(name = "Compute password hash", skip(password, salt))]
-async fn compute_password_hash(password: String, salt: String) -> Result<String, anyhow::Error> {
+async fn compute_password_hash(
+    password: String,
+    salt: SaltString,
+) -> Result<String, anyhow::Error> {
     spawn_blocking_with_tracing(move || {
-        let salt = SaltString::encode_b64(&salt.as_bytes())?;
         let password_hash = Argon2::new(
             Algorithm::Argon2id,
             Version::V0x13,
@@ -180,26 +185,48 @@ async fn compute_password_hash(password: String, salt: String) -> Result<String,
 async fn verify_password_hash(
     expected_password_hash: String,
     password_candidate: String,
-) -> Result<(), AuthError> {
+) -> Result<(), anyhow::Error> {
     spawn_blocking_with_tracing(move || {
         let expected_password_hash = PasswordHash::new(expected_password_hash.as_str())
-            .context("Failed to parse hash in PHC string format.")
-            .map_err(AuthError::UnexpectedError)?;
+            .context("Failed to parse hash in PHC string format.")?;
 
         Argon2::default()
             .verify_password(password_candidate.as_bytes(), &expected_password_hash)
             .context("Invalid password.")
-            .map_err(AuthError::InvalidCredentials)
     })
     .await?
 }
 
-#[derive(thiserror::Error, Debug)]
-pub enum AuthError {
-    #[error("Invalid credentials.")]
-    InvalidCredentials(#[source] anyhow::Error),
-    #[error(transparent)]
-    UnexpectedError(#[from] anyhow::Error),
-    #[error(transparent)]
-    JoinError(#[from] tokio::task::JoinError),
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[tokio::test]
+    async fn password_hash_computation() {
+        let password = "password".to_string();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        let salt_string = salt.to_string();
+        let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
+        assert_ne!(password_hash, password);
+    }
+
+    #[tokio::test]
+    async fn password_verification_success() {
+        let password = "password".to_string();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        let salt_string = salt.to_string();
+        let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
+        let result = verify_password_hash(password_hash, password).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn password_verification_failure() {
+        let password = "password".to_string();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        let salt_string = salt.to_string();
+        let password_hash = compute_password_hash(password.clone(), salt).await.unwrap();
+        let result = verify_password_hash(password_hash, "foobar".to_string()).await;
+        assert!(result.is_err());
+    }
 }
