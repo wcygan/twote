@@ -61,3 +61,11 @@ function dcr ([string]$service) {
     docker-compose up -d $service
 }
 ```
+
+## Adding dependencies
+
+If you're adding a dependency to a service, you'll need to rebuild the base images. You can do this by running:
+
+```
+./scripts/bootstrap_docker.sh
+```
