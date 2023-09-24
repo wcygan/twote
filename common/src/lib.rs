@@ -21,11 +21,7 @@ impl Service {
     }
 
     pub fn addr(&self) -> String {
-        match self {
-            _ => {
-                format!("https://{}:{}", self.name(), self.port())
-            }
-        }
+        format!("https://{}:{}", self.name(), self.port())
     }
 
     pub fn socket_addr(&self) -> SocketAddr {

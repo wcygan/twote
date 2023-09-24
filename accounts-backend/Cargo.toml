@@ -6,6 +6,8 @@ license = "MIT"
 
 [dependencies]
 schemas = { path = "../schemas" }
+tracing.workspace=true
+tracing-subscriber.workspace=true
 common = { path = "../common" }
 tonic.workspace=true
 tonic-health.workspace=true
