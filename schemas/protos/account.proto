@@ -12,15 +12,11 @@ message LoginRequest {
   string password = 2;
 }
 
-message LoginResponse {
-  bool success = 2;
-}
+message LoginResponse {}
 
 message CreateAccountRequest {
   string username = 1;
   string password = 2;
 }
 
-message CreateAccountResponse {
-  bool success = 2;
-}
+message CreateAccountResponse {}
