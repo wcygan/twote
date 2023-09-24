@@ -19,18 +19,6 @@ impl AccountServiceImpl {
         &self,
         req: CreateAccountRequest,
     ) -> Result<Response<CreateAccountResponse>, Status> {
-        // let x = sqlx::query_as!(
-        //     r#"
-        // INSERT INTO users (name, email)
-        // VALUES ($1, $2)
-        // ON CONFLICT (email) DO NOTHING
-        // "#,
-        //     req.username,
-        //     req.password
-        // )
-        // .execute(&self.pool)
-        // .await;
-
         let message = format!("oops! not implemented! Sorrybot!");
         Err(Status::new(Code::Aborted, message))
     }

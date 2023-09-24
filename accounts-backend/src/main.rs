@@ -19,6 +19,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .connect(env::var("DATABASE_URL").unwrap().as_str())
         .await?;
 
+    // Apply the migrations
+    sqlx::migrate!().run(&pool).await?;
+
     // Create the services
     let login_service = AccountServiceServer::new(AccountServiceImpl::new(pool.clone()));
     let (_, health_service) = tonic_health::server::health_reporter();

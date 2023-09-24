@@ -2,7 +2,6 @@ FROM twote-rust-builder AS chef
 WORKDIR /app
 
 FROM chef AS builder
-COPY .sqlx/ /app/.sqlx/
 COPY common/ /app/common/
 COPY schemas/ /app/schemas/
 COPY accounts-backend/ /app/accounts-backend/
