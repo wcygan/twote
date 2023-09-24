@@ -1,6 +1,8 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use tokio::task::JoinHandle;
 
+pub mod middleware;
+
 pub enum Service {
     TwoteApi,
     AccountsBackend,
@@ -9,7 +11,7 @@ pub enum Service {
 impl Service {
     pub fn port(&self) -> u16 {
         match self {
-            Service::TwoteApi => 8081,
+            Service::TwoteApi => 8087,
             Service::AccountsBackend => 8082,
         }
     }
