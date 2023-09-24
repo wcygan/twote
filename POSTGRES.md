@@ -44,3 +44,6 @@ See [Offline Mode in sqlx](https://docs.rs/sqlx/latest/sqlx/macro.query.html#off
 ```
 cargo sqlx prepare --database-url postgres://myuser:mypassword@localhost/mydatabase --workspace
 ```
+
+Keep the generated `.json` file in the root of the workspace:
+> query data written to .sqlx in the workspace root; please check this into version control

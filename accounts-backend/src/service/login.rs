@@ -11,13 +11,14 @@ use uuid::Uuid;
 use validator::Validate;
 
 #[derive(Debug, Validate)]
-struct SignupData {
+struct LoginData {
     #[validate(length(min = 4))]
     username: String,
     #[validate(length(min = 4))]
     password: String,
 }
 
+#[derive(Debug)]
 struct Account {
     user_id: Uuid,
     username: String,
@@ -51,7 +52,7 @@ impl AccountService for AccountServiceImpl {
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
         let data = create_account_data(request)?;
-        self.persist_account(data).await
+        self.persist_credentials(data).await
     }
 }
 
@@ -60,7 +61,8 @@ impl AccountServiceImpl {
         Self { pool }
     }
 
-    async fn persist_account(
+    #[tracing::instrument(name = "Persist credentials", skip(self))]
+    async fn persist_credentials(
         &self,
         data: Account,
     ) -> Result<Response<CreateAccountResponse>, Status> {
@@ -76,6 +78,34 @@ impl AccountServiceImpl {
         .await
         .map(|_| Response::new(CreateAccountResponse {}))
         .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
+    }
+
+    #[tracing::instrument(name = "Validate credentials", skip(self))]
+    async fn validate_credentials(
+        &self,
+        data: LoginData,
+    ) -> Result<Option<(Uuid, String)>, Status> {
+        let (user_id, password_hash) = self.get_credentials(data).await?;
+
+        unimplemented!()
+    }
+
+    #[tracing::instrument(name = "Get credentials", skip(self))]
+    async fn get_credentials(&self, data: LoginData) -> Result<(Uuid, String), Status> {
+        sqlx::query!(
+            r#"
+            SELECT user_id, password_hash
+            FROM users
+            WHERE username = $1
+            "#,
+            data.username,
+        )
+        .fetch_one(&self.pool)
+        .await
+        .map_or(
+            Err(Status::new(Code::Internal, "Credentials not found")),
+            |row| Ok((row.user_id, row.password_hash)),
+        )
     }
 }
 
@@ -105,8 +135,8 @@ fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account
     Ok(account)
 }
 
-fn validate_credentials(request: CreateAccountRequest) -> Result<SignupData, Status> {
-    let u = SignupData {
+fn validate_credentials(request: CreateAccountRequest) -> Result<LoginData, Status> {
+    let u = LoginData {
         username: request.username,
         password: request.password,
     };
