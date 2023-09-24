@@ -1,3 +1,5 @@
+use argon2::password_hash::SaltString;
+use argon2::{Algorithm, Argon2, Params, PasswordHasher, Version};
 use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
 use schemas::account::CreateAccountResponse;
@@ -14,6 +16,13 @@ struct SignupData {
     username: String,
     #[validate(length(min = 4))]
     password: String,
+}
+
+struct Account {
+    user_id: Uuid,
+    username: String,
+    password_hash: String,
+    salt: String,
 }
 
 pub struct AccountServiceImpl {
@@ -41,8 +50,8 @@ impl AccountService for AccountServiceImpl {
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
-        let data = validate_credentials(request.into_inner())?;
-        self.create_account(data).await
+        let data = create_account_data(request)?;
+        self.persist_account(data).await
     }
 }
 
@@ -51,16 +60,17 @@ impl AccountServiceImpl {
         Self { pool }
     }
 
-    async fn create_account(
+    async fn persist_account(
         &self,
-        data: SignupData,
+        data: Account,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         sqlx::query!(
-            "INSERT INTO users (user_id, username, password)
-            VALUES ($1, $2, $3)",
-            Uuid::new_v4(),
+            "INSERT INTO users (user_id, username, password_hash, salt)
+            VALUES ($1, $2, $3, $4)",
+            data.user_id,
             data.username,
-            data.password,
+            data.password_hash,
+            data.salt,
         )
         .execute(&self.pool)
         .await
@@ -69,10 +79,36 @@ impl AccountServiceImpl {
     }
 }
 
-fn validate_credentials(req: CreateAccountRequest) -> Result<SignupData, Status> {
+fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account, Status> {
+    // Validate the credentials provided by the user
+    let credentials = validate_credentials(request.into_inner())?;
+
+    // Hash the password with salt
+    let salt = SaltString::generate(&mut rand::thread_rng());
+    let password_hash = Argon2::new(
+        Algorithm::Argon2id,
+        Version::V0x13,
+        Params::new(15000, 2, 1, None).unwrap(),
+    )
+    .hash_password(credentials.password.as_bytes(), &salt)
+    .unwrap()
+    .to_string();
+
+    // Create the data to be stored in the database
+    let account = Account {
+        user_id: Uuid::new_v4(),
+        username: credentials.username,
+        password_hash,
+        salt: salt.to_string(),
+    };
+
+    Ok(account)
+}
+
+fn validate_credentials(request: CreateAccountRequest) -> Result<SignupData, Status> {
     let u = SignupData {
-        username: req.username,
-        password: req.password,
+        username: request.username,
+        password: request.password,
     };
 
     u.validate()
