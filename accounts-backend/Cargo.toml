@@ -18,3 +18,4 @@ tonic-health.workspace=true
 tokio.workspace=true
 sqlx.workspace=true
 uuid.workspace=true
+validator.workspace=true

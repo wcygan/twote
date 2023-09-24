@@ -6,32 +6,18 @@ use sqlx::PgPool;
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
+use validator::Validate;
+
+#[derive(Debug, Validate)]
+struct SignupData {
+    #[validate(length(min = 4))]
+    username: String,
+    #[validate(length(min = 4))]
+    password: String,
+}
 
 pub struct AccountServiceImpl {
     pool: PgPool,
-}
-
-impl AccountServiceImpl {
-    pub fn new(pool: PgPool) -> Self {
-        Self { pool }
-    }
-
-    pub async fn try_create(
-        &self,
-        req: CreateAccountRequest,
-    ) -> Result<Response<CreateAccountResponse>, Status> {
-        sqlx::query!(
-            "INSERT INTO users (user_id, username, password)
-            VALUES ($1, $2, $3)",
-            Uuid::new_v4(),
-            req.username,
-            req.password,
-        )
-        .execute(&self.pool)
-        .await
-        .map(|_| Response::new(CreateAccountResponse {}))
-        .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
-    }
 }
 
 #[tonic::async_trait]
@@ -55,6 +41,42 @@ impl AccountService for AccountServiceImpl {
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
-        self.try_create(request.into_inner()).await
+        let data = validate_credentials(request.into_inner())?;
+        self.create_account(data).await
     }
+}
+
+impl AccountServiceImpl {
+    pub fn new(pool: PgPool) -> Self {
+        Self { pool }
+    }
+
+    async fn create_account(
+        &self,
+        data: SignupData,
+    ) -> Result<Response<CreateAccountResponse>, Status> {
+        sqlx::query!(
+            "INSERT INTO users (user_id, username, password)
+            VALUES ($1, $2, $3)",
+            Uuid::new_v4(),
+            data.username,
+            data.password,
+        )
+        .execute(&self.pool)
+        .await
+        .map(|_| Response::new(CreateAccountResponse {}))
+        .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
+    }
+}
+
+fn validate_credentials(req: CreateAccountRequest) -> Result<SignupData, Status> {
+    let u = SignupData {
+        username: req.username,
+        password: req.password,
+    };
+
+    u.validate()
+        .map_err(|e| Status::new(Code::InvalidArgument, e.to_string()))?;
+
+    Ok(u)
 }
