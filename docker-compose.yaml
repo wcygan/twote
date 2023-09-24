@@ -51,9 +51,7 @@ services:
       retries: 25
 
   accounts-db:
-    build:
-      context: .
-      dockerfile: postgres:latest
+    image: postgres:16
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
