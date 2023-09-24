@@ -12,7 +12,9 @@ message LoginRequest {
   string password = 2;
 }
 
-message LoginResponse {}
+message LoginResponse {
+  string token = 1;
+}
 
 message CreateAccountRequest {
   string username = 1;

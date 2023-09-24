@@ -53,7 +53,7 @@ impl AccountService for AccountServiceImpl {
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
-        let data = create_account_data(request)?;
+        let data = create_account_data(request).await?;
         self.persist_credentials(data).await
     }
 }
@@ -86,26 +86,25 @@ impl AccountServiceImpl {
     async fn validate_credentials(
         &self,
         data: LoginData,
-    ) -> Result<Option<(Uuid, String)>, Status> {
-        let (user_id, stored_password_hash, stored_salt) = self.get_credentials(data).await?;
+    ) -> Result<Response<LoginResponse>, Status> {
+        let (_, stored_password_hash, stored_salt) = self.get_credentials(&data).await?;
 
-        // TODO @wcygan: maybe there is a bug here since we're not using the salt
-        // spawn_blocking_with_tracing(move || {
-        //     verify_password_hash(expected_password_hash, credentials.password)
-        // })
-        //     .await
-        //     .context("Failed to spawn blocking task.")
-        //     .map_err(AuthError::UnexpectedError)??;
-        //
-        // user_id
-        //     .ok_or_else(|| anyhow::anyhow!("Unknown username."))
-        //     .map_err(AuthError::InvalidCredentials)
+        let candidate_password_hash = compute_password_hash(data.password, stored_salt)
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
-        unimplemented!()
+        verify_password_hash(stored_password_hash, candidate_password_hash)
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        // TODO: Persist this token in redis
+        let token = Uuid::new_v4().to_string();
+
+        Ok(Response::new(LoginResponse { token }))
     }
 
     #[tracing::instrument(name = "Get credentials", skip(self))]
-    async fn get_credentials(&self, data: LoginData) -> Result<(Uuid, String, String), Status> {
+    async fn get_credentials(&self, data: &LoginData) -> Result<(Uuid, String, String), Status> {
         sqlx::query!(
             r#"
             SELECT user_id, password_hash, salt
@@ -124,20 +123,15 @@ impl AccountServiceImpl {
 }
 
 #[tracing::instrument(name = "Create account data", skip(request))]
-fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account, Status> {
+async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account, Status> {
     // Validate the credentials provided by the user
     let credentials = validate_new_credentials(request.into_inner())?;
 
     // Hash the password with salt
     let salt = SaltString::generate(&mut rand::thread_rng());
-    let password_hash = Argon2::new(
-        Algorithm::Argon2id,
-        Version::V0x13,
-        Params::new(15000, 2, 1, None).unwrap(),
-    )
-    .hash_password(credentials.password.as_bytes(), &salt)
-    .unwrap()
-    .to_string();
+    let password_hash = compute_password_hash(credentials.password, salt.to_string())
+        .await
+        .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
     // Create the data to be stored in the database
     let account = Account {
