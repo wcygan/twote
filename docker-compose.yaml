@@ -53,7 +53,7 @@ services:
   accounts-db:
     build:
       context: .
-      dockerfile: images/accounts-db/Dockerfile
+      dockerfile: postgres:latest
     environment:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: myuser
