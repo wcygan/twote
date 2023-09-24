@@ -14,6 +14,26 @@ impl AccountServiceImpl {
     pub fn new(pool: PgPool) -> Self {
         Self { pool }
     }
+
+    pub async fn try_create(
+        &self,
+        req: CreateAccountRequest,
+    ) -> Result<Response<CreateAccountResponse>, Status> {
+        // let x = sqlx::query_as!(
+        //     r#"
+        // INSERT INTO users (name, email)
+        // VALUES ($1, $2)
+        // ON CONFLICT (email) DO NOTHING
+        // "#,
+        //     name,
+        //     email
+        // )
+        // .execute(&self.pool)
+        // .await;
+
+        let message = format!("oops! not implemented! Sorrybot!");
+        Err(Status::new(Code::Aborted, message))
+    }
 }
 
 #[tonic::async_trait]
@@ -24,16 +44,6 @@ impl AccountService for AccountServiceImpl {
         request: Request<LoginRequest>,
     ) -> Result<Response<LoginResponse>, Status> {
         info!("Processing LoginRequest");
-
-        // Run the query
-        let mut query = sqlx::query!(
-            r#"
-        SELECT user_id, username, password
-        FROM users
-        "#
-        )
-        .fetch(&self.pool);
-
         let message = format!(
             "oops! not implemented! Sorry {}!",
             request.into_inner().username
@@ -47,10 +57,6 @@ impl AccountService for AccountServiceImpl {
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
-        let message = format!(
-            "oops! not implemented! Sorry {}bot!",
-            request.into_inner().username
-        );
-        Err(Status::new(Code::Aborted, message))
+        self.try_create(request.into_inner()).await
     }
 }
