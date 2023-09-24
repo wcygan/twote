@@ -17,6 +17,7 @@ function HelloComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
+                setResponse(response.getReply());
             }
         });
     };
