@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT user_id, password_hash\n            FROM users\n            WHERE username = $1\n            ",
+  "query": "\n            SELECT user_id, password_hash, salt\n            FROM users\n            WHERE username = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -12,6 +12,11 @@
         "ordinal": 1,
         "name": "password_hash",
         "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "salt",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -21,8 +26,9 @@
     },
     "nullable": [
       false,
+      false,
       false
     ]
   },
-  "hash": "e6aedce04f0d04de7e7d07db20dfeb24d42b43d6ccc36c9a34f4158c3fa42dea"
+  "hash": "db2ba9042800dfcfb360ca9163ed0998b7363b8c083ef7c2b9c35f1b59750162"
 }

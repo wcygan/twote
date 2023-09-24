@@ -1,6 +1,7 @@
 use anyhow::Context;
 use argon2::password_hash::SaltString;
 use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
+use common::spawn_blocking_with_tracing;
 use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
 use schemas::account::CreateAccountResponse;
@@ -86,16 +87,28 @@ impl AccountServiceImpl {
         &self,
         data: LoginData,
     ) -> Result<Option<(Uuid, String)>, Status> {
-        let (user_id, password_hash) = self.get_credentials(data).await?;
+        let (user_id, stored_password_hash, stored_salt) = self.get_credentials(data).await?;
+
+        // TODO @wcygan: maybe there is a bug here since we're not using the salt
+        // spawn_blocking_with_tracing(move || {
+        //     verify_password_hash(expected_password_hash, credentials.password)
+        // })
+        //     .await
+        //     .context("Failed to spawn blocking task.")
+        //     .map_err(AuthError::UnexpectedError)??;
+        //
+        // user_id
+        //     .ok_or_else(|| anyhow::anyhow!("Unknown username."))
+        //     .map_err(AuthError::InvalidCredentials)
 
         unimplemented!()
     }
 
     #[tracing::instrument(name = "Get credentials", skip(self))]
-    async fn get_credentials(&self, data: LoginData) -> Result<(Uuid, String), Status> {
+    async fn get_credentials(&self, data: LoginData) -> Result<(Uuid, String, String), Status> {
         sqlx::query!(
             r#"
-            SELECT user_id, password_hash
+            SELECT user_id, password_hash, salt
             FROM users
             WHERE username = $1
             "#,
@@ -105,7 +118,7 @@ impl AccountServiceImpl {
         .await
         .map_or(
             Err(Status::new(Code::Internal, "Credentials not found")),
-            |row| Ok((row.user_id, row.password_hash)),
+            |row| Ok((row.user_id, row.password_hash, row.salt)),
         )
     }
 }
@@ -150,22 +163,41 @@ fn validate_new_credentials(request: CreateAccountRequest) -> Result<LoginData, 
     Ok(u)
 }
 
+#[tracing::instrument(name = "Compute password hash", skip(password, salt))]
+async fn compute_password_hash(password: String, salt: String) -> Result<String, anyhow::Error> {
+    spawn_blocking_with_tracing(move || {
+        let salt = SaltString::encode_b64(&salt.as_bytes())?;
+        let password_hash = Argon2::new(
+            Algorithm::Argon2id,
+            Version::V0x13,
+            Params::new(15000, 2, 1, None).unwrap(),
+        )
+        .hash_password(password.as_bytes(), &salt)?
+        .to_string();
+        Ok(password_hash)
+    })
+    .await?
+}
+
 #[tracing::instrument(
     name = "Verify password hash",
     skip(expected_password_hash, password_candidate)
 )]
-fn verify_password_hash(
+async fn verify_password_hash(
     expected_password_hash: String,
     password_candidate: String,
 ) -> Result<(), AuthError> {
-    let expected_password_hash = PasswordHash::new(expected_password_hash.as_str())
-        .context("Failed to parse hash in PHC string format.")
-        .map_err(AuthError::UnexpectedError)?;
+    spawn_blocking_with_tracing(move || {
+        let expected_password_hash = PasswordHash::new(expected_password_hash.as_str())
+            .context("Failed to parse hash in PHC string format.")
+            .map_err(AuthError::UnexpectedError)?;
 
-    Argon2::default()
-        .verify_password(password_candidate.as_bytes(), &expected_password_hash)
-        .context("Invalid password.")
-        .map_err(AuthError::InvalidCredentials)
+        Argon2::default()
+            .verify_password(password_candidate.as_bytes(), &expected_password_hash)
+            .context("Invalid password.")
+            .map_err(AuthError::InvalidCredentials)
+    })
+    .await?
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -174,4 +206,6 @@ pub enum AuthError {
     InvalidCredentials(#[source] anyhow::Error),
     #[error(transparent)]
     UnexpectedError(#[from] anyhow::Error),
+    #[error(transparent)]
+    JoinError(#[from] tokio::task::JoinError),
 }
