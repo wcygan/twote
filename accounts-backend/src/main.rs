@@ -1,10 +1,8 @@
 use crate::service::login::AccountServiceImpl;
-use common::middleware::authentication::auth_interceptor;
 use common::Service::AccountsBackend;
 use schemas::account::account_service_server::AccountServiceServer;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
-use tonic::service::interceptor;
 use tonic::transport::Server;
 
 mod service;

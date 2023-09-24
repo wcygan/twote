@@ -11,7 +11,7 @@ pub enum Service {
 impl Service {
     pub fn port(&self) -> u16 {
         match self {
-            Service::TwoteApi => 8087,
+            Service::TwoteApi => 8081,
             Service::AccountsBackend => 8082,
         }
     }

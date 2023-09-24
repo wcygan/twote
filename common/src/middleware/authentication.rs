@@ -1,56 +1,65 @@
+use futures::TryFutureExt;
 use hyper::Body;
 use std::task::{Context, Poll};
-use tonic::transport::Server;
-use tonic::{Request, Status};
-use tower::Service;
+use tonic::body::BoxBody;
+use tonic::Status;
+use tower::{Layer, Service};
 use tracing::info;
 
-#[tracing::instrument()]
-pub fn auth_interceptor(request: Request<()>) -> Result<Request<()>, Status> {
-    if valid_credentials(&request) {
-        Ok(request)
-    } else {
-        Err(Status::unauthenticated("invalid credentials"))
-    }
-}
+const ALLOWED_UNAUTHORIZED_PATHS: [&str; 2] = [
+    "/account.AccountService/Login",
+    "/account.AccountService/CreateAccount",
+];
 
-fn valid_credentials(request: &Request<()>) -> bool {
-    true
-}
-
-#[derive(Default)]
-struct AuthMiddleware<S> {
+#[derive(Default, Clone)]
+pub struct AuthMiddleware<S> {
     inner: S,
 }
 
 impl<S> AuthMiddleware<S> {
-    fn new(service: S) -> Self {
+    pub fn new(service: S) -> Self {
         Self { inner: service }
+    }
+}
+
+impl<S> Layer<S> for AuthMiddleware<S> {
+    type Service = AuthMiddleware<S>;
+
+    fn layer(&self, inner: S) -> Self::Service {
+        AuthMiddleware { inner }
     }
 }
 
 impl<S> Service<hyper::Request<Body>> for AuthMiddleware<S>
 where
-    S: Service<hyper::Request<Body>>,
-    S::Error: Into<Status>,
+    S: Service<hyper::Request<Body>, Response = hyper::Response<BoxBody>> + Clone + Send + 'static,
+    S::Future: Send + 'static,
 {
     type Response = S::Response;
     type Error = S::Error;
-    type Future = S::Future;
+    type Future = futures::future::BoxFuture<'static, Result<Self::Response, Self::Error>>;
 
     fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
         self.inner.poll_ready(cx)
     }
 
-    #[tracing::instrument(skip(self))]
     fn call(&mut self, req: hyper::Request<Body>) -> Self::Future {
-        // Get the URI from the request.
         let uri = req.uri();
+        info!("uri: {}", uri);
+        println!("uri: {}", uri);
 
-        // Perform your authentication checks here.
-        // For example, examine the URI and decide whether to proceed.
-        // ...
+        // This is necessary because tonic internally uses `tower::buffer::Buffer`.
+        // See https://github.com/tower-rs/tower/issues/547#issuecomment-767629149
+        // for details on why this is necessary
+        let clone = self.inner.clone();
+        let mut inner = std::mem::replace(&mut self.inner, clone);
 
-        self.inner.call(req)
+        Box::pin(async move {
+            if ALLOWED_UNAUTHORIZED_PATHS.contains(&req.uri().path()) {
+                return inner.call(req).await;
+            }
+
+            Ok(Status::unauthenticated("please sign in first").to_http())
+        })
     }
 }
