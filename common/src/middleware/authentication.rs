@@ -44,7 +44,7 @@ where
         self.inner.poll_ready(cx)
     }
 
-    fn call(&mut self, req: hyper::Request<Body>) -> Self::Future {
+    fn call(&mut self, mut req: hyper::Request<Body>) -> Self::Future {
         // This is necessary because tonic internally uses `tower::buffer::Buffer`.
         // See https://github.com/tower-rs/tower/issues/547#issuecomment-767629149
         // for details on why this is necessary
@@ -52,16 +52,23 @@ where
         let mut inner = std::mem::replace(&mut self.inner, clone);
 
         // TODO: figure out where the token can come from
-        info!("ddd {:?}", req);
+        info!("checking for token {:?}", req);
 
         Box::pin(async move {
             if ALLOWED_UNAUTHORIZED_PATHS.contains(&req.uri().path()) {
                 return inner.call(req).await;
             }
 
-            // TODO: get the token & check redis
-            if let Ok(value) = get_token("foo".to_string()).await {
-                // TODO: put the user-id into the metadata
+            if let Some(Ok(token)) = req.headers().get("authorization").map(|v| v.to_str()) {
+                info!("got token {:?}", token);
+
+                if let Ok(value) = get_token(token.to_string()).await {
+                    if let Ok(v) = value.parse() {
+                        req.headers_mut().insert("user-id", v);
+                    }
+
+                    return inner.call(req).await;
+                }
             }
 
             Ok(Status::unauthenticated("please sign in first").to_http())
