@@ -51,21 +51,20 @@ where
         let clone = self.inner.clone();
         let mut inner = std::mem::replace(&mut self.inner, clone);
 
-        // TODO: figure out where the token can come from
-        info!("checking for token {:?}", req);
-
         Box::pin(async move {
             if ALLOWED_UNAUTHORIZED_PATHS.contains(&req.uri().path()) {
                 return inner.call(req).await;
             }
 
             if let Some(Ok(token)) = req.headers().get("authorization").map(|v| v.to_str()) {
-                info!("got token {:?}", token);
-
                 if let Ok(value) = get_token(token.to_string()).await {
-                    if let Ok(v) = value.parse() {
-                        // TODO: verify that this is working (or fix it)
-                        req.headers_mut().insert("user-id", v);
+                    match value.parse() {
+                        Ok(v) => {
+                            req.headers_mut().insert("user-id", v);
+                        }
+                        Err(e) => {
+                            info!("value is invalid: {}", e);
+                        }
                     }
 
                     return inner.call(req).await;
