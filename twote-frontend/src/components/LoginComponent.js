@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { LoginRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
+import { AUTH_TOKEN} from '../middleware/AuthInterceptor.js';
 import Cookies from 'js-cookie';
-
-const AUTH_TOKEN = "authorization-token"
 
 function LoginComponent() {
     const [response, setResponse] = useState('');
