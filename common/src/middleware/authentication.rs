@@ -1,8 +1,9 @@
 use std::task::{Context, Poll};
 
 use hyper::Body;
+use redis::AsyncCommands;
 use tonic::body::BoxBody;
-use tonic::Status;
+use tonic::{Code, Status};
 use tower::{Layer, Service};
 
 const ALLOWED_UNAUTHORIZED_PATHS: [&str; 2] = [
@@ -18,6 +19,20 @@ pub struct AuthMiddleware<S> {
 impl<S> AuthMiddleware<S> {
     pub fn new(service: S) -> Self {
         Self { inner: service }
+    }
+
+    async fn get_token(&self, key: String) -> Result<String, Status> {
+        let client = redis::Client::open("redis://token-cache/")
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        let mut con = client
+            .get_async_connection()
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        con.get(key)
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))
     }
 }
 
@@ -53,6 +68,8 @@ where
             if ALLOWED_UNAUTHORIZED_PATHS.contains(&req.uri().path()) {
                 return inner.call(req).await;
             }
+
+            // if let Ok(value) = self.get_token("foo".to_string()).await {}
 
             Ok(Status::unauthenticated("please sign in first").to_http())
         })

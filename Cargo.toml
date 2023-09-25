@@ -25,3 +25,4 @@ sqlx = { version = "0.7.1", features = [ "runtime-tokio", "postgres", "uuid" ] }
 validator = { version = "0.16.1", features = ["derive"] }
 argon2 = { version = "0.5.1", features = ["std"] }
 rand = { version = "0.8.1", features = ["std_rng"] }
+redis = { version = "0.23.3", features = ["tokio-comp"] }
