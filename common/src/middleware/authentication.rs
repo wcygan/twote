@@ -1,10 +1,9 @@
-use futures::TryFutureExt;
-use hyper::Body;
 use std::task::{Context, Poll};
+
+use hyper::Body;
 use tonic::body::BoxBody;
 use tonic::Status;
 use tower::{Layer, Service};
-use tracing::info;
 
 const ALLOWED_UNAUTHORIZED_PATHS: [&str; 2] = [
     "/account.AccountService/Login",
@@ -44,10 +43,6 @@ where
     }
 
     fn call(&mut self, req: hyper::Request<Body>) -> Self::Future {
-        let uri = req.uri();
-        info!("uri: {}", uri);
-        println!("uri: {}", uri);
-
         // This is necessary because tonic internally uses `tower::buffer::Buffer`.
         // See https://github.com/tower-rs/tower/issues/547#issuecomment-767629149
         // for details on why this is necessary
