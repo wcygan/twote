@@ -43,7 +43,7 @@ function CreateAccountComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Send gRPC Request</button>
+            <button onClick={sendRequest}>Create Account</button>
             <p>Response: {response}</p>
         </div>
     );
