@@ -19,9 +19,6 @@ export const authOptions = {
     // Add interceptors that are called on each request
     unaryInterceptors: [authInterceptor],
     streamInterceptors: [authInterceptor],
-    // Ensure that credentials are included with each request
-    withCredentials: true,
-    credentials: 'include'
 }
 
 export default AuthInterceptor;
