@@ -23,7 +23,6 @@ function LoginComponent() {
             } else {
                 console.log(response);
                 Cookies.set(AUTH_TOKEN, response.getToken());
-                console.log("token cookie: " + Cookies.get(AUTH_TOKEN));
                 setResponse("success");
             }
         });

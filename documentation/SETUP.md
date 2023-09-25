@@ -11,7 +11,7 @@ Apply your new settings & reload your terminal with `. $PROFILE` (or completely 
 
 | Releases | `C:\bin`                | System Path Variable     |
 |----------|---------------------|--------------------------|
-| ![img_2.png](resources/releases.png)         | ![img.png](resources/bin.png) | ![img_1.png](resources/env.png)  |
+| ![img_2.png](../resources/releases.png)         | ![img.png](../resources/bin.png) | ![img_1.png](../resources/env.png)  |
 
 
 ## 1: Install protocol buffers
@@ -75,4 +75,4 @@ Once your IDE is installed, simply open the root directory of the project in you
 
 ## 7: Run the server
 
-See [README.md](README.md#running-the-app) for instructions on how to run the server.
+See [README.md](../README.md#running-the-app) for instructions on how to run the server.
