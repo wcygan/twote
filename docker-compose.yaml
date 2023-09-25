@@ -63,3 +63,8 @@ services:
       interval: 300ms
       timeout: 500ms
       retries: 25
+
+  token-cache:
+    image: redis:latest
+    ports:
+      - "6379:6379"
