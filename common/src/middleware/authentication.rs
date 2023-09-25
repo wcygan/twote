@@ -64,6 +64,7 @@ where
 
                 if let Ok(value) = get_token(token.to_string()).await {
                     if let Ok(v) = value.parse() {
+                        // TODO: verify that this is working (or fix it)
                         req.headers_mut().insert("user-id", v);
                     }
 
