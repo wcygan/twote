@@ -5,6 +5,7 @@ use redis::AsyncCommands;
 use tonic::body::BoxBody;
 use tonic::{Code, Status};
 use tower::{Layer, Service};
+use tracing::info;
 
 const ALLOWED_UNAUTHORIZED_PATHS: [&str; 2] = [
     "/account.AccountService/Login",
@@ -19,20 +20,6 @@ pub struct AuthMiddleware<S> {
 impl<S> AuthMiddleware<S> {
     pub fn new(service: S) -> Self {
         Self { inner: service }
-    }
-
-    async fn get_token(&self, key: String) -> Result<String, Status> {
-        let client = redis::Client::open("redis://token-cache/")
-            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
-
-        let mut con = client
-            .get_async_connection()
-            .await
-            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
-
-        con.get(key)
-            .await
-            .map_err(|e| Status::new(Code::Internal, e.to_string()))
     }
 }
 
@@ -64,14 +51,36 @@ where
         let clone = self.inner.clone();
         let mut inner = std::mem::replace(&mut self.inner, clone);
 
+        // TODO: figure out where the token can come from
+        info!("ddd {:?}", req);
+
         Box::pin(async move {
             if ALLOWED_UNAUTHORIZED_PATHS.contains(&req.uri().path()) {
                 return inner.call(req).await;
             }
 
-            // if let Ok(value) = self.get_token("foo".to_string()).await {}
+            // TODO: get the token & check redis
+            if let Ok(value) = get_token("foo".to_string()).await {
+                // TODO: put the user-id into the metadata
+            }
 
             Ok(Status::unauthenticated("please sign in first").to_http())
         })
     }
+}
+
+// TODO: move this into `impl<S> AuthMiddleware<S>` and initiate a pool of redis clients to reuse
+//       Make it `Clone` so that you can clone before Box::pin
+async fn get_token(key: String) -> Result<String, Status> {
+    let client = redis::Client::open("redis://token-cache/")
+        .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+    let mut con = client
+        .get_async_connection()
+        .await
+        .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+    con.get(key)
+        .await
+        .map_err(|e| Status::new(Code::Internal, e.to_string()))
 }

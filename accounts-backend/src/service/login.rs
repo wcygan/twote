@@ -123,6 +123,7 @@ impl AccountServiceImpl {
         )
     }
 
+    // TODO: initiate a pool of redis clients to reuse
     #[tracing::instrument(name = "Persisting token to redis", skip(self))]
     async fn persist_token(&self, key: String, value: String) -> Result<(), Status> {
         info!("persisting ({key}, {value})");
