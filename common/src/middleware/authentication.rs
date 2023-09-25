@@ -78,6 +78,8 @@ where
 
 // TODO: move this into `impl<S> AuthMiddleware<S>` and initiate a pool of redis clients to reuse
 //       Make it `Clone` so that you can clone before Box::pin
+//       Alternatively, it may possible to pass a pool of redis clients to `AuthMiddleware`
+//       and then clone the pool before Box::pin
 async fn get_token(key: String) -> Result<String, Status> {
     let client = redis::Client::open("redis://token-cache/")
         .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
