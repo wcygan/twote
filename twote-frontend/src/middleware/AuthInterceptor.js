@@ -1,6 +1,5 @@
 import Cookies from 'js-cookie';
 
-require('grpc-web');
 export const AUTH_TOKEN = "authorization-token"
 
 /**
@@ -19,9 +18,13 @@ const InterceptedStream = function (stream) {
 InterceptedStream.prototype.on = function (eventType, callback) {
     if (eventType === 'error') {
         const newCallback = (response) => {
-            console.log("got " + eventType)
-            console.log(response)
-            console.log(response.code)
+            if (response.code === 16) {
+                // Remove token from cookies
+                Cookies.remove(AUTH_TOKEN);
+
+                // Redirect to login page
+                window.location.href = "/login";
+            }
             callback(response);
         };
 
