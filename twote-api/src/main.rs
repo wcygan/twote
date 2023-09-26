@@ -10,10 +10,10 @@ mod service;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Setup the logger
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
         .init();
-    let addr = TwoteApi.socket_addr();
 
     // Create the services
     let login_service = AccountServiceServer::new(AccountServiceImpl);
@@ -21,6 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (_, health_service) = tonic_health::server::health_reporter();
 
     // Start the server
+    let addr = TwoteApi.socket_addr();
     println!("twote-api running on {}", addr);
     Server::builder()
         .layer(AuthMiddleware::default())
