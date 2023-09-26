@@ -1,4 +1,5 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use tokio::task::JoinHandle;
 
 pub enum Service {
     TwoteApi,
@@ -28,4 +29,13 @@ impl Service {
         let ip = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
         SocketAddr::new(ip, self.port())
     }
+}
+
+pub fn spawn_blocking_with_tracing<F, R>(f: F) -> JoinHandle<R>
+where
+    F: FnOnce() -> R + Send + 'static,
+    R: Send + 'static,
+{
+    let current_span = tracing::Span::current();
+    tokio::task::spawn_blocking(move || current_span.in_scope(f))
 }

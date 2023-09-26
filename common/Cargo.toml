@@ -6,3 +6,7 @@ license = "MIT"
 
 [lib]
 path = "src/lib.rs"
+
+[dependencies]
+tokio.workspace=true
+tracing.workspace=true

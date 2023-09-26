@@ -20,7 +20,7 @@ function LoginComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
-                setResponse(response.getReply());
+                setResponse("success");
             }
         });
     };

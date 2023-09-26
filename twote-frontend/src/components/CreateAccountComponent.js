@@ -20,7 +20,7 @@ function CreateAccountComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
-                setResponse(response.getReply());
+                setResponse("success");
             }
         });
     };
@@ -43,7 +43,7 @@ function CreateAccountComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Create Account</button>
+            <button onClick={sendRequest}>Send gRPC Request</button>
             <p>Response: {response}</p>
         </div>
     );

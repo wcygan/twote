@@ -13,6 +13,13 @@ schemas = { path = "../schemas" }
 tracing.workspace=true
 tracing-subscriber.workspace=true
 common = { path = "../common" }
+anyhow.workspace=true
+thiserror.workspace=true
 tonic.workspace=true
 tonic-health.workspace=true
 tokio.workspace=true
+sqlx.workspace=true
+uuid.workspace=true
+validator.workspace=true
+argon2.workspace=true
+rand.workspace=true

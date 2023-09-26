@@ -13,7 +13,7 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  bool success = 2;
+  string token = 1;
 }
 
 message CreateAccountRequest {
@@ -21,6 +21,4 @@ message CreateAccountRequest {
   string password = 2;
 }
 
-message CreateAccountResponse {
-  bool success = 2;
-}
+message CreateAccountResponse {}
