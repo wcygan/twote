@@ -39,7 +39,7 @@ manager).
 
 Follow https://docs.npmjs.com/downloading-and-installing-node-js-and-npm to install `npm`.
 
-After installing `npm`, run `npm install` within the `twote-frontend` directory. This will install of the project's Javascript dependencies.
+After installing `npm`, run `npm install` within the `twote-web` directory. This will install of the project's Javascript dependencies.
 
 ## 4: compile the proto files
 

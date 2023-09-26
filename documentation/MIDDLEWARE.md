@@ -15,6 +15,6 @@ See PRs [#14](https://github.com/wcygan/twote/pull/14) & [#15](https://github.co
 
 ## Frontend Middleware
 
-`twote-frontend` uses middleware to add authentication tokens to requests & to invalidate sessions for unauthenticated users.
+`twote-web` uses middleware to add authentication tokens to requests & to invalidate sessions for unauthenticated users.
 
 See PRs [#15](https://github.com/wcygan/twote/pull/15) & [#16](https://github.com/wcygan/twote/pull/16) for how frontend authentication middleware was added.

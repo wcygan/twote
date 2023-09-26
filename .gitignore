@@ -1,4 +1,4 @@
-twote-frontend/src/proto/*
+twote-web/src/proto/*
 
 **/target
 **/.DS_Store
