@@ -268,7 +268,6 @@ version = "0.1.0"
 dependencies = [
  "futures",
  "hyper",
- "schemas",
  "tokio",
  "tonic",
  "tower",

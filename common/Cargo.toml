@@ -8,7 +8,6 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
-schemas = { path = "../schemas" }
 futures.workspace=true
 hyper.workspace=true
 tokio.workspace=true
