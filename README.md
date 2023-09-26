@@ -13,7 +13,14 @@ See [SETUP.md](documentation/SETUP.md) for instructions on how to set up the pro
 The application runs within Docker. Start it with this command:
 
 ```
-docker-compose up -d
+./scripts/bootstrap_docker.sh
 ```
+
+For windows, use this command:
+
+```
+./scripts/windows/bootstrap_docker.ps1
+```
+
 
 Next, open http://localhost:3000/ in your browser.
