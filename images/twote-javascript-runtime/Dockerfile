@@ -14,7 +14,7 @@ RUN apt update && apt install -y protobuf-compiler
 WORKDIR /app
 
 # Copy package.json and package-lock.json for caching
-COPY twote-frontend/package*.json ./
+COPY twote-web/package*.json ./
 
 # Install dependencies
 RUN npm install
