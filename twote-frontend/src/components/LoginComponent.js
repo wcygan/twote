@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { LoginRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
@@ -25,12 +26,11 @@ function LoginComponent() {
             } else {
                 console.log(response);
                 Cookies.set(AUTH_TOKEN, response.getToken());
-                setResponse("success");
+                navigate('/');
             }
         });
     };
 
-    // Function to navigate to /create-account route
     const navigateToCreateAccount = () => {
         navigate('/create-account');
     }
@@ -53,8 +53,8 @@ function LoginComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Login</button>
-            <button onClick={navigateToCreateAccount}>Need an Account?</button> {/* Create Account button */}
+            <Button onClick={sendRequest}>Login</Button>
+            <Button onClick={navigateToCreateAccount}>Need an Account?</Button>
             <p>Response: {response}</p>
         </div>
     );

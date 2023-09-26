@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {HelloRequest} from '../proto/hello_pb.js';
 import {HelloServiceClient} from '../proto/hello_grpc_web_pb.js';
-import { authOptions } from '../middleware/AuthInterceptor.js';
+import {authOptions} from '../middleware/AuthInterceptor.js';
+import {Button} from "react-bootstrap";
 
 function HelloComponent() {
     const [response, setResponse] = useState('');
@@ -24,7 +25,7 @@ function HelloComponent() {
     };
 
     return (<div>
-            <button onClick={sendRequest}>Send gRPC Request</button>
+            <Button onClick={sendRequest}>Send gRPC Request</Button>
             <p>Response: {response}</p>
         </div>);
 }
