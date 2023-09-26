@@ -1,16 +1,17 @@
 import HelloComponent from './components/HelloComponent';
 import LoginComponent from './components/LoginComponent';
 import CreateAccountComponent from "./components/CreateAccountComponent";
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+
 
 function App() {
     return (
         <Router>
-            <Switch>
-                <Route path="/" exact component={HelloComponent} />
-                <Route path="/login" component={LoginComponent} />
-                <Route path="/create-account" component={CreateAccountComponent} />
-            </Switch>
+            <Routes>
+                <Route path="/" element={<HelloComponent />} />
+                <Route path="/login" element={<LoginComponent />} />
+                <Route path="/create-account" element={<CreateAccountComponent />} />
+            </Routes>
         </Router>
     );
 }
