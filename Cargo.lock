@@ -284,7 +284,6 @@ dependencies = [
  "futures",
  "hyper",
  "redis",
- "schemas",
  "tokio",
  "tonic",
  "tower",

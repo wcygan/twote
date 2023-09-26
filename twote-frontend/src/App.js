@@ -1,18 +1,19 @@
 import HelloComponent from './components/HelloComponent';
 import LoginComponent from './components/LoginComponent';
 import CreateAccountComponent from "./components/CreateAccountComponent";
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 function App() {
-  return (
-      <div>
-        <h1>Hello Request:</h1>
-        <HelloComponent />
-        <h1>Login Request:</h1>
-        <LoginComponent />
-        <h1>Create Account Request:</h1>
-        <CreateAccountComponent />
-      </div>
-  );
+    return (
+        <Router>
+            <Switch>
+                <Route path="/" exact component={HelloComponent} />
+                <Route path="/login" component={LoginComponent} />
+                <Route path="/create-account" component={CreateAccountComponent} />
+            </Switch>
+        </Router>
+    );
 }
+
 
 export default App;
