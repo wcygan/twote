@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package account;
+
+service AccountService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  bool success = 2;
+}
+
+message CreateAccountRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message CreateAccountResponse {
+  bool success = 2;
+}

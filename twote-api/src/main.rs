@@ -1,10 +1,10 @@
-use common::Service::TwoteApi;
-use schemas::hello::hello_service_server::HelloServiceServer;
-use schemas::login::login_service_server::LoginServiceServer;
-use tonic::transport::Server;
-
 use crate::service::hello::HelloServiceImpl;
-use crate::service::login::LoginServiceImpl;
+use crate::service::login::AccountServiceImpl;
+use common::Service::TwoteApi;
+use schemas::account::account_service_server::AccountServiceServer;
+
+use schemas::hello::hello_service_server::HelloServiceServer;
+use tonic::transport::Server;
 
 mod service;
 
@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = TwoteApi.socket_addr();
 
     // Create the services
-    let login_service = LoginServiceServer::new(LoginServiceImpl);
+    let login_service = AccountServiceServer::new(AccountServiceImpl);
     let hello_service = HelloServiceServer::new(HelloServiceImpl);
     let (_, health_service) = tonic_health::server::health_reporter();
 

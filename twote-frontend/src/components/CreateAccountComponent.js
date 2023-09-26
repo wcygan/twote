@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { LoginRequest } from '../proto/account_pb.js';
+import { CreateAccountRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
 
-function LoginComponent() {
+function CreateAccountComponent() {
     const [response, setResponse] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -10,11 +10,11 @@ function LoginComponent() {
     const sendRequest = () => {
         const client = new AccountServiceClient("http://localhost:8080");
 
-        const request = new LoginRequest();
+        const request = new CreateAccountRequest();
         request.setUsername(username);
         request.setPassword(password);
 
-        client.login(request, {}, (err, response) => {
+        client.createAccount(request, {}, (err, response) => {
             if (err) {
                 console.error(err);
                 setResponse('Error: ' + err.message);
@@ -43,10 +43,10 @@ function LoginComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Send gRPC Request</button>
+            <button onClick={sendRequest}>Create Account</button>
             <p>Response: {response}</p>
         </div>
     );
 }
 
-export default LoginComponent;
+export default CreateAccountComponent;
