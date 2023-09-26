@@ -59,7 +59,7 @@ impl Service {
     pub fn port(&self) -> u16 {
         match self {
             Service::TwoteApi => 8081,
-            Service::AccountsBackend => 8089,
+            Service::AccountsBackend => 8082,
         }
     }
 
