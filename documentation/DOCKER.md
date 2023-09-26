@@ -8,7 +8,7 @@ Firstly, I have no idea how to correctly use Docker. This is the first time I'm 
 chmod +x ./scripts/bootstrap_docker.sh && ./scripts/bootstrap_docker.sh 
 ```
 
-See [bootstrap_docker.ps1](scripts/windows/bootstrap_docker.ps1) for windows.
+See [bootstrap_docker.ps1](../scripts/windows/bootstrap_docker.ps1) for windows.
 
 ## Running the application
 

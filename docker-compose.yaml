@@ -28,6 +28,8 @@ services:
     depends_on:
       accounts-backend:
             condition: service_healthy
+      token-cache:
+        condition: service_healthy
     volumes:
       - ./schemas:/usr/src/schemas
 
@@ -60,6 +62,16 @@ services:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U myuser -d mydatabase"]
+      interval: 300ms
+      timeout: 500ms
+      retries: 25
+
+  token-cache:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
       interval: 300ms
       timeout: 500ms
       retries: 25

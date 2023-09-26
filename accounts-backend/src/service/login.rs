@@ -2,6 +2,7 @@ use anyhow::Context;
 use argon2::password_hash::SaltString;
 use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use common::spawn_blocking_with_tracing;
+use redis::AsyncCommands;
 use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
 use schemas::account::CreateAccountResponse;
@@ -97,10 +98,9 @@ impl AccountServiceImpl {
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
-        // TODO: Persist this KV in redis
         let token = Uuid::new_v4().to_string();
-
-        let (_key, _value) = (token.clone(), user_id);
+        self.persist_token(token.clone(), user_id.to_string())
+            .await?;
 
         Ok(Response::new(LoginResponse { token }))
     }
@@ -121,6 +121,24 @@ impl AccountServiceImpl {
             Err(Status::new(Code::Internal, "Credentials not found")),
             |row| Ok((row.user_id, row.password_hash)),
         )
+    }
+
+    // TODO: initiate a pool of redis clients to reuse
+    #[tracing::instrument(name = "Persisting token to redis", skip(self))]
+    async fn persist_token(&self, key: String, value: String) -> Result<(), Status> {
+        info!("persisting ({key}, {value})");
+
+        let client = redis::Client::open("redis://token-cache/")
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        let mut con = client
+            .get_async_connection()
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        con.set(key, value)
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))
     }
 }
 

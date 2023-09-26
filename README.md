@@ -6,7 +6,7 @@ A social media app where users can post messages and follow other users.
 
 ## Local Setup
 
-See [SETUP.md](SETUP.md) for instructions on how to set up the project on your local machine.
+See [SETUP.md](documentation/SETUP.md) for instructions on how to set up the project on your local machine.
 
 ## Running the app
 

@@ -14,3 +14,4 @@ tokio.workspace=true
 tower.workspace=true
 tonic.workspace=true
 tracing.workspace=true
+redis.workspace=true

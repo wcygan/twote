@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { LoginRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
+import { AUTH_TOKEN} from '../middleware/AuthInterceptor.js';
+import Cookies from 'js-cookie';
 
 function LoginComponent() {
     const [response, setResponse] = useState('');
@@ -20,6 +22,7 @@ function LoginComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
+                Cookies.set(AUTH_TOKEN, response.getToken());
                 setResponse("success");
             }
         });
