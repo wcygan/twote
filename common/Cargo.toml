@@ -8,5 +8,9 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
+futures.workspace=true
+hyper.workspace=true
 tokio.workspace=true
+tower.workspace=true
+tonic.workspace=true
 tracing.workspace=true

@@ -1,6 +1,8 @@
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use tokio::task::JoinHandle;
 
+pub mod middleware;
+
 pub enum Service {
     TwoteApi,
     AccountsBackend,

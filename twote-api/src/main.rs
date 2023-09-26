@@ -1,8 +1,8 @@
 use crate::service::hello::HelloServiceImpl;
 use crate::service::login::AccountServiceImpl;
+use common::middleware::authentication::AuthMiddleware;
 use common::Service::TwoteApi;
 use schemas::account::account_service_server::AccountServiceServer;
-
 use schemas::hello::hello_service_server::HelloServiceServer;
 use tonic::transport::Server;
 
@@ -23,9 +23,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Start the server
     println!("twote-api running on {}", addr);
     Server::builder()
+        .layer(AuthMiddleware::default())
         .add_service(health_service)
-        .add_service(hello_service)
         .add_service(login_service)
+        .add_service(hello_service)
         .serve(addr)
         .await?;
 
