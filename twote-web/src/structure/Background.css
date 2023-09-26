@@ -1,0 +1,4 @@
+.background {
+    background-color: #2f2f2f; /* This is a dark gray color */
+    min-height: 100vh; /* Make sure it covers the full view height */
+}

@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { CreateAccountRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
+import {Button} from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
 
 function CreateAccountComponent() {
+    const navigate = useNavigate();
     const [response, setResponse] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -20,7 +23,7 @@ function CreateAccountComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
-                setResponse("success");
+                navigate('/login');
             }
         });
     };
@@ -43,7 +46,7 @@ function CreateAccountComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Send gRPC Request</button>
+            <Button onClick={sendRequest}>Create Account</Button>
             <p>Response: {response}</p>
         </div>
     );

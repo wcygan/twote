@@ -9,3 +9,12 @@ RUN apt update && apt install -y wget \
 
 # Install protoc
 RUN apt update && apt install -y protobuf-compiler
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json for caching
+COPY twote-web/package*.json ./
+
+# Install dependencies
+RUN npm install

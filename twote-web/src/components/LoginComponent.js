@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 import { LoginRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
 import { AUTH_TOKEN} from '../middleware/AuthInterceptor.js';
 import Cookies from 'js-cookie';
 
 function LoginComponent() {
+    const navigate = useNavigate();
     const [response, setResponse] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -23,10 +26,14 @@ function LoginComponent() {
             } else {
                 console.log(response);
                 Cookies.set(AUTH_TOKEN, response.getToken());
-                setResponse("success");
+                navigate('/');
             }
         });
     };
+
+    const navigateToCreateAccount = () => {
+        navigate('/create-account');
+    }
 
     return (
         <div>
@@ -46,7 +53,8 @@ function LoginComponent() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            <button onClick={sendRequest}>Send gRPC Request</button>
+            <Button onClick={sendRequest}>Login</Button>
+            <Button onClick={navigateToCreateAccount}>Need an Account?</Button>
             <p>Response: {response}</p>
         </div>
     );

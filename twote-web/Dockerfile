@@ -14,9 +14,6 @@ RUN ./scripts/proto.sh
 
 WORKDIR twote-web
 
-# Install npm
-RUN npm install
-
 EXPOSE 3000
 
 CMD ["npm", "start"]
