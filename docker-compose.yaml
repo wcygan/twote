@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  twote-frontend:
+  twote-web:
     build:
       context: .
-      dockerfile: twote-frontend/Dockerfile
+      dockerfile: twote-web/Dockerfile
     ports:
       - "3000:3000"
     depends_on:
