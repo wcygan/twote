@@ -112,7 +112,7 @@ Run the service:
 cargo run --bin accounts-backend
 ```
 
-Since `accounts-backend` runs on port `8082`, we can use a tool like [grpc-health-probe](https://github.com/grpc-ecosystem/grpc-health-probe) to check the health of the service:
+`accounts-backend` runs on port `8082`; we can use a tool like [grpc-health-probe](https://github.com/grpc-ecosystem/grpc-health-probe) to check the health of the service:
 
 ```bash
 grpc-health-probe -addr=localhost:8082
