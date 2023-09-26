@@ -14,6 +14,19 @@ cargo new accounts-backend
 
 This will create a new Rust project in the `accounts-backend` directory. 
 
+You need to add this new service to the [Workspace](../Cargo.toml) in the root directory:
+
+```toml
+[workspace]
+members = [
+    "common",
+    "schemas",
+    "twote-api",
+    # Add the new service here: 
+    "accounts-backend"
+]
+```
+
 ## Adding Dependencies
 
 Next, you can add any dependencies to the `Cargo.toml` file. A Rust + gRPC service will likely need, at least, the following dependencies:
@@ -31,6 +44,35 @@ tracing-subscriber.workspace=true
 The dependencies are being pulled from the [Workspace Dependencies](../Cargo.toml) in the root directory. This allows us to share versioned dependencies between services.
 
 Tokio & Tonic are the dependencies which power the gRPC server. Tracing is used for logging.
+
+## Create a new `Service`
+
+Navigate to [service.rs](../common/src/service.rs) Add your service to the enum & fill out the `name` and `port` methods.
+
+```rust
+pub enum Service {
+    TwoteApi,
+    AccountsBackend,
+}
+
+impl Service {
+    pub fn port(&self) -> u16 {
+        match self {
+            Service::TwoteApi => 8081,
+            Service::AccountsBackend => 8089,
+        }
+    }
+
+    pub fn name(&self) -> &'static str {
+        match self {
+            Service::TwoteApi => "twote-api",
+            Service::AccountsBackend => "accounts-backend",
+        }
+    }
+    
+    ...
+}
+```
 
 ## Setup `main.rs`
 
