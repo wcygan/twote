@@ -4,6 +4,7 @@ use schemas::account::account_service_server::AccountServiceServer;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 use tonic::transport::Server;
+use tracing::info;
 
 mod service;
 
@@ -28,7 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Start the server
     let addr = AccountsBackend.socket_addr();
-    println!("accounts-backend is running on {}", addr);
+    info!("accounts-backend is running on {}", addr);
     Server::builder()
         .add_service(health_service)
         .add_service(login_service)

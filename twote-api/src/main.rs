@@ -7,6 +7,7 @@ use schemas::account::account_service_server::AccountServiceServer;
 use schemas::hello::hello_service_server::HelloServiceServer;
 use schemas::profile::profile_service_server::ProfileServiceServer;
 use tonic::transport::Server;
+use tracing::info;
 
 mod service;
 
@@ -25,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Start the server
     let addr = TwoteApi.socket_addr();
-    println!("twote-api running on {}", addr);
+    info!("twote-api running on {}", addr);
     Server::builder()
         .layer(AuthMiddleware::default())
         .add_service(health_service)

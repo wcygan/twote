@@ -79,7 +79,7 @@ services:
   profiles-db:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - "27018:27018"
     healthcheck:
         test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
         interval: 300ms

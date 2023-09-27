@@ -81,6 +81,7 @@ Next, we need to setup the `main.rs` file. This file will contain the main entry
 ```rust
 use common::Service::AccountsBackend;
 use tonic::transport::Server;
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -94,7 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Start the server
     let addr = AccountsBackend.socket_addr();
-    println!("accounts-backend is running on {}", addr);
+    info!("accounts-backend is running on {}", addr);
     Server::builder()
         .add_service(health_service)
         .serve(addr)

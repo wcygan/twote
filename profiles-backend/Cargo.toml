@@ -18,3 +18,4 @@ tower.workspace=true
 tonic-health.workspace=true
 tokio.workspace=true
 anyhow.workspace=true
+mongodb.workspace=true
