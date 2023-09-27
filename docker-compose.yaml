@@ -75,3 +75,13 @@ services:
       interval: 300ms
       timeout: 500ms
       retries: 25
+
+  profiles-db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    healthcheck:
+        test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+        interval: 300ms
+        timeout: 500ms
+        retries: 25
