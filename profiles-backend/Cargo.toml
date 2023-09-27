@@ -1,11 +1,11 @@
 [package]
-name = "twote-api"
+name = "profiles-backend"
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
 
 [[bin]]
-name = "twote-api"
+name = "profiles-backend"
 path = "src/main.rs"
 
 [dependencies]
@@ -18,4 +18,3 @@ tower.workspace=true
 tonic-health.workspace=true
 tokio.workspace=true
 anyhow.workspace=true
-redis.workspace=true

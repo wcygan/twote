@@ -1203,6 +1203,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiles-backend"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "common",
+ "schemas",
+ "tokio",
+ "tonic",
+ "tonic-health",
+ "tower",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "prost"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
