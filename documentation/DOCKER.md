@@ -1,14 +1,14 @@
 # Docker Setup
 
-Firstly, I have no idea how to correctly use Docker. This is the first time I'm trying it out. By separating these docker images out, it seems that I'm able to get a quicker feedback loop.
-
-## Initial Setup
+After installing Docker, you'll need to run the following commands to get your environment setup:
 
 ```bash 
 chmod +x ./scripts/bootstrap_docker.sh && ./scripts/bootstrap_docker.sh 
 ```
 
-See [bootstrap_docker.ps1](../scripts/windows/bootstrap_docker.ps1) for windows.
+Use [bootstrap_docker.ps1](../scripts/windows/bootstrap_docker.ps1) for windows.
+
+Whenever you install new dependencies you will need to run this script again.
 
 ## Running the application
 

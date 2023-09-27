@@ -143,6 +143,18 @@ COPY --from=builder /app/target/debug/accounts-backend /usr/local/bin
 ENTRYPOINT ["/usr/local/bin/accounts-backend"]
 ```
 
+Also, modify the [twote-rust-builder](../images/twote-rust-builder/Dockerfile) Docker image to include the `accounts-backend` service:
+
+```Dockerfile
+# Copy over the Cargo.toml files of every crate in the workspace
+COPY Cargo.toml /app/Cargo.toml
+COPY common/Cargo.toml /app/common/Cargo.toml
+COPY schemas/Cargo.toml /app/schemas/Cargo.toml
+COPY twote-api/Cargo.toml /app/twote-api/Cargo.toml
+# Add the new service here:
+COPY accounts-backend/Cargo.toml /app/accounts-backend/Cargo.toml
+```
+
 ## Docker Compose
 
 Next, we need to add the service to [docker-compose.yaml](../docker-compose.yaml) so that it can be run with the rest of the services.

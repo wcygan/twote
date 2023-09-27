@@ -81,7 +81,24 @@ services:
     ports:
       - "27017:27017"
     healthcheck:
-        test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+        test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
         interval: 300ms
         timeout: 500ms
         retries: 25
+
+  profiles-backend:
+    build:
+      context: .
+      dockerfile: profiles-backend/Dockerfile
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./schemas:/usr/src/schemas
+    depends_on:
+      profiles-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "grpc-health-probe", "-addr=localhost:8083"]
+      interval: 300ms
+      timeout: 500ms
+      retries: 25
