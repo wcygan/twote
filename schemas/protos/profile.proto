@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package profile;
+
+service ProfileService {
+  rpc Create(Profile) returns (google.protobuf.Empty) {};
+  rpc Get(GetProfileRequest) returns (Profile) {};
+  rpc BatchGet(BatchGetProfileRequest) returns (BatchGetProfileResponse) {};
+}
+
+message Profile {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string biography = 4;
+  google.protobuf.Timestamp joined_at = 5;
+}
+
+message GetProfileRequest {
+  string id = 1;
+}
+
+message BatchGetProfileRequest {
+  repeated string ids = 1;
+}
+
+message BatchGetProfileResponse {
+  repeated Profile profiles = 1;
+}

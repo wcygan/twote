@@ -7,3 +7,7 @@ pub mod hello {
 pub mod account {
     include!(concat!(env!("OUT_DIR"), "/account.rs"));
 }
+
+pub mod profile {
+    include!(concat!(env!("OUT_DIR"), "/profile.rs"));
+}
