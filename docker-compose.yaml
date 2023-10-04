@@ -27,7 +27,7 @@ services:
       - "8081:8081"
     depends_on:
       accounts-backend:
-            condition: service_healthy
+        condition: service_healthy
       token-cache:
         condition: service_healthy
     volumes:
@@ -47,7 +47,7 @@ services:
       accounts-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "grpc-health-probe", "-addr=localhost:8082"]
+      test: [ "CMD", "grpc-health-probe", "-addr=localhost:8082" ]
       interval: 300ms
       timeout: 500ms
       retries: 25
@@ -61,7 +61,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -p 5432 -U myuser -d mydatabase"]
+      test: [ "CMD-SHELL", "pg_isready -h localhost -p 5432 -U myuser -d mydatabase" ]
       interval: 300ms
       timeout: 500ms
       retries: 25
@@ -71,7 +71,7 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
+      test: [ "CMD-SHELL", "redis-cli ping" ]
       interval: 300ms
       timeout: 500ms
       retries: 25
@@ -81,10 +81,10 @@ services:
     ports:
       - "27018:27018"
     healthcheck:
-        test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
-        interval: 300ms
-        timeout: 500ms
-        retries: 25
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 500ms
+      timeout: 500ms
+      retries: 25
 
   profiles-backend:
     build:
@@ -98,7 +98,7 @@ services:
       profiles-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "grpc-health-probe", "-addr=localhost:8083"]
+      test: [ "CMD", "grpc-health-probe", "-addr=localhost:8083" ]
       interval: 300ms
       timeout: 500ms
       retries: 25
