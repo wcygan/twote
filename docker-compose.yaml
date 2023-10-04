@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   twote-web:
@@ -79,12 +79,13 @@ services:
   profiles-db:
     image: mongo:latest
     ports:
-      - "27018:27018"
+      - "27017:27017"
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 500ms
       timeout: 500ms
       retries: 25
+      start_period: 20s
 
   profiles-backend:
     build:
