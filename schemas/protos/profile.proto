@@ -6,25 +6,31 @@ import "google/protobuf/empty.proto";
 package profile;
 
 service ProfileService {
-  rpc Create(Profile) returns (google.protobuf.Empty) {};
+  rpc Create(CreateProfileRequest) returns (google.protobuf.Empty) {};
   rpc Get(GetProfileRequest) returns (Profile) {};
   rpc BatchGet(BatchGetProfileRequest) returns (BatchGetProfileResponse) {};
 }
 
 message Profile {
-  string id = 1;
+  string user_id = 1;
   string first_name = 2;
   string last_name = 3;
   string biography = 4;
   google.protobuf.Timestamp joined_at = 5;
 }
 
+message CreateProfileRequest {
+  string user_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+}
+
 message GetProfileRequest {
-  string id = 1;
+  string user_id = 1;
 }
 
 message BatchGetProfileRequest {
-  repeated string ids = 1;
+  repeated string user_ids = 1;
 }
 
 message BatchGetProfileResponse {

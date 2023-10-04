@@ -9,6 +9,8 @@ function CreateAccountComponent() {
     const [response, setResponse] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
 
     const sendRequest = () => {
         const client = new AccountServiceClient("http://localhost:8080");
@@ -16,6 +18,8 @@ function CreateAccountComponent() {
         const request = new CreateAccountRequest();
         request.setUsername(username);
         request.setPassword(password);
+        request.setFirstName(firstName);
+        request.setLastName(lastName);
 
         client.createAccount(request, {}, (err, response) => {
             if (err) {
@@ -44,6 +48,22 @@ function CreateAccountComponent() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                />
+            </div>
+            <div>
+                <label>First Name:</label>
+                <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                />
+            </div>
+            <div>
+                <label>Last Name:</label>
+                <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
                 />
             </div>
             <Button onClick={sendRequest}>Create Account</Button>

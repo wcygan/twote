@@ -2,7 +2,8 @@ use common::Service::ProfilesBackend;
 use schemas::profile::profile_service_client::ProfileServiceClient;
 use schemas::profile::profile_service_server::ProfileService;
 use schemas::profile::{
-    BatchGetProfileRequest, BatchGetProfileResponse, GetProfileRequest, Profile,
+    BatchGetProfileRequest, BatchGetProfileResponse, CreateProfileRequest, GetProfileRequest,
+    Profile,
 };
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
@@ -12,7 +13,7 @@ pub struct ProfileServiceImpl;
 #[tonic::async_trait]
 impl ProfileService for ProfileServiceImpl {
     #[tracing::instrument(skip(self))]
-    async fn create(&self, request: Request<Profile>) -> Result<Response<()>, Status> {
+    async fn create(&self, request: Request<CreateProfileRequest>) -> Result<Response<()>, Status> {
         info!("Creating Profile");
         ProfileServiceClient::connect(ProfilesBackend.addr())
             .await

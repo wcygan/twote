@@ -15,6 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
 
     let client = mongodb::Client::with_uri_str("mongodb://profiles-db:27017").await?;
+
     let names = client.list_database_names(None, None).await?;
     info!("Databases:");
     for name in names {

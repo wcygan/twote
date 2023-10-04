@@ -1,17 +1,21 @@
 use anyhow::Context;
 use argon2::password_hash::SaltString;
 use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
-use common::spawn_blocking_with_tracing;
 use redis::AsyncCommands;
-use schemas::account::account_service_server::AccountService;
-use schemas::account::CreateAccountRequest;
-use schemas::account::CreateAccountResponse;
-use schemas::account::{LoginRequest, LoginResponse};
 use sqlx::PgPool;
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 use validator::Validate;
+
+use common::spawn_blocking_with_tracing;
+use common::Service::ProfilesBackend;
+use schemas::account::account_service_server::AccountService;
+use schemas::account::CreateAccountRequest;
+use schemas::account::CreateAccountResponse;
+use schemas::account::{LoginRequest, LoginResponse};
+use schemas::profile::profile_service_client::ProfileServiceClient;
+use schemas::profile::CreateProfileRequest;
 
 #[derive(Debug, Validate)]
 struct LoginData {
@@ -59,8 +63,30 @@ impl AccountService for AccountServiceImpl {
         request: Request<CreateAccountRequest>,
     ) -> Result<Response<CreateAccountResponse>, Status> {
         info!("Processing CreateAccountRequest");
-        let data = create_account_data(request).await?;
-        self.persist_credentials(data).await
+        let request = request.into_inner();
+        let data = create_account_data(&request).await?;
+
+        // TODO: use a transaction and commit only if profile creation succeeds
+        match self.persist_credentials(data).await {
+            Ok(result) => {
+                let create_profile_request = CreateProfileRequest {
+                    user_id: result.user_id.clone(),
+                    first_name: request.first_name,
+                    last_name: request.last_name,
+                };
+
+                ProfileServiceClient::connect(ProfilesBackend.addr())
+                    .await
+                    .map_err(|e| Status::new(Code::Internal, e.to_string()))?
+                    .create(Request::new(create_profile_request))
+                    .await?;
+
+                Ok(Response::new(result))
+            }
+            Err(e) => {
+                return Err(e);
+            }
+        }
     }
 }
 
@@ -70,10 +96,7 @@ impl AccountServiceImpl {
     }
 
     #[tracing::instrument(name = "Persist credentials", skip(self))]
-    async fn persist_credentials(
-        &self,
-        data: Account,
-    ) -> Result<Response<CreateAccountResponse>, Status> {
+    async fn persist_credentials(&self, data: Account) -> Result<CreateAccountResponse, Status> {
         sqlx::query!(
             "INSERT INTO users (user_id, username, password_hash)
             VALUES ($1, $2, $3)",
@@ -83,7 +106,9 @@ impl AccountServiceImpl {
         )
         .execute(&self.pool)
         .await
-        .map(|_| Response::new(CreateAccountResponse {}))
+        .map(|_| CreateAccountResponse {
+            user_id: data.user_id.to_string(),
+        })
         .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
     }
 
@@ -143,9 +168,9 @@ impl AccountServiceImpl {
 }
 
 #[tracing::instrument(name = "Create account data", skip(request))]
-async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<Account, Status> {
+async fn create_account_data(request: &CreateAccountRequest) -> Result<Account, Status> {
     // Validate the credentials provided by the user
-    let credentials = validate_new_credentials(request.into_inner())?;
+    let credentials = validate_new_credentials(request)?;
 
     // Hash the password with salt
     let salt = SaltString::generate(&mut rand::thread_rng());
@@ -164,10 +189,10 @@ async fn create_account_data(request: Request<CreateAccountRequest>) -> Result<A
 }
 
 #[tracing::instrument(name = "Validate credentials", skip(request))]
-fn validate_new_credentials(request: CreateAccountRequest) -> Result<LoginData, Status> {
+fn validate_new_credentials(request: &CreateAccountRequest) -> Result<LoginData, Status> {
     let u = LoginData {
-        username: request.username,
-        password: request.password,
+        username: request.username.clone(),
+        password: request.password.clone(),
     };
 
     u.validate()
