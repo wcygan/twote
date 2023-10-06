@@ -1543,6 +1543,7 @@ dependencies = [
  "anyhow",
  "common",
  "mongodb",
+ "prost-types",
  "schemas",
  "tokio",
  "tonic",
