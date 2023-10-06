@@ -3,6 +3,7 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 pub enum Service {
     TwoteApi,
     AccountsBackend,
+    ProfilesBackend,
 }
 
 impl Service {
@@ -10,6 +11,7 @@ impl Service {
         match self {
             Service::TwoteApi => 8081,
             Service::AccountsBackend => 8082,
+            Service::ProfilesBackend => 8083,
         }
     }
 
@@ -17,6 +19,7 @@ impl Service {
         match self {
             Service::TwoteApi => "twote-api",
             Service::AccountsBackend => "accounts-backend",
+            Service::ProfilesBackend => "profiles-backend",
         }
     }
 

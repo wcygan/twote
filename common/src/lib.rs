@@ -1,6 +1,8 @@
 use tokio::task::JoinHandle;
 
+mod db;
 mod service;
+pub use db::{MongoCollection, MongoDB};
 pub use service::Service;
 pub mod middleware;
 

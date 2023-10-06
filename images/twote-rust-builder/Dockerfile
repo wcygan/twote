@@ -7,6 +7,7 @@ COPY common/Cargo.toml /app/common/Cargo.toml
 COPY schemas/Cargo.toml /app/schemas/Cargo.toml
 COPY twote-api/Cargo.toml /app/twote-api/Cargo.toml
 COPY accounts-backend/Cargo.toml /app/accounts-backend/Cargo.toml
+COPY profiles-backend/Cargo.toml /app/profiles-backend/Cargo.toml
 
 # Install & cache all dependencies
 RUN apt update && apt install -y protobuf-compiler
