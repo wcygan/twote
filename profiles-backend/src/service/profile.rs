@@ -18,7 +18,7 @@ pub struct ProfileServiceImpl {
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct ProfileDao {
-    id: String,
+    _id: String,
     first_name: String,
     last_name: String,
     bio: String,
@@ -67,8 +67,11 @@ impl ProfileService for ProfileServiceImpl {
         // Build and return the response
         match profile {
             Some(profile) => {
-                let profile_dao = bson::from_document::<ProfileDao>(profile)
-                    .map_err(|_| Status::internal("Failed to get profile"))?;
+                info!("Found profile: {:?}", profile);
+                let profile_dao = bson::from_document::<ProfileDao>(profile).map_err(|e| {
+                    info!("Failed to deserialize profile: {:?}", e);
+                    Status::internal("Failed to get profile")
+                })?;
                 Ok(Response::new(profile_dao.as_proto()))
             }
             None => Err(Status::not_found("Profile not found")),
@@ -130,7 +133,7 @@ impl ProfileDao {
         };
 
         Self {
-            id: request.user_id,
+            _id: request.user_id,
             first_name: request.first_name,
             last_name: request.last_name,
             bio: String::new(),
@@ -140,7 +143,7 @@ impl ProfileDao {
 
     fn to_bson(&self) -> bson::Document {
         doc! {
-            "_id": &self.id,
+            "_id": &self._id,
             "first_name": &self.first_name,
             "last_name": &self.last_name,
             "bio": &self.bio,
@@ -155,7 +158,7 @@ impl ProfileDao {
         };
 
         Profile {
-            user_id: self.id.clone(),
+            user_id: self._id.clone(),
             first_name: self.first_name.clone(),
             last_name: self.last_name.clone(),
             biography: self.bio.clone(),

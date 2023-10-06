@@ -10,10 +10,8 @@ You may need to setup data in your databases before testing the gRPC endpoints. 
 
 # Testing gRPC from the terminal
 
-You can run a command such as the following to test gRPC endpoints from the terminal.
+You will need [grpcurl](https://github.com/fullstorydev/grpcurl) installed.
 
-```bash
-grpcurl -proto schemas/protos/profile.proto -plaintext -d '{"user_id": "611f56d0-3f3f-4729-be91-df2004b50800"}' localhost:8083 profile.ProfileService/Get
-```
+Next, find example requests in the [grpcurl-examples](../grpcurl-examples) folder.
 
-This command builds a request to the `Get` endpoint of the `ProfileService` service. The request body is the JSON object `{"user_id": "611f56d0-3f3f-4729-be91-df2004b50800"}`. The `-proto` flag specifies the path to the `.proto` file that defines the protobuf schema.
+For example, [profile.md](../grpcurl-examples/profile.md) contains examples for [profile.proto](../schemas/protos/profile.proto).
