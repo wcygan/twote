@@ -10,6 +10,7 @@ resolver = "2"
 
 [workspace.dependencies]
 futures = "0.3.28"
+serde = { version = "1.0.188", features = ["derive"] }
 anyhow = "1.0.69"
 thiserror = "1.0.48"
 tonic = "0.10.0"

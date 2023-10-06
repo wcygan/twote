@@ -2,6 +2,7 @@ use common::{MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
 use std::time::Instant;
+use tonic::codegen::tokio_stream::StreamExt;
 use tonic::{Request, Response, Status};
 use tracing::info;
 
@@ -15,6 +16,7 @@ pub struct ProfileServiceImpl {
     client: mongodb::Client,
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct ProfileDao {
     id: String,
     first_name: String,
@@ -32,8 +34,8 @@ impl ProfileService for ProfileServiceImpl {
     ) -> Result<Response<()>, Status> {
         info!("Creating Profile");
 
+        // Insert the profile into the database
         let bson_data = ProfileDao::create_from(_request.into_inner()).to_bson();
-
         self.client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -47,7 +49,30 @@ impl ProfileService for ProfileServiceImpl {
     #[tracing::instrument(skip(self))]
     async fn get(&self, _request: Request<GetProfileRequest>) -> Result<Response<Profile>, Status> {
         info!("Getting Profile");
-        Err(Status::unimplemented("get profile"))
+
+        // Get the profile from the database
+        let profile = self
+            .client
+            .database(MongoDB::Profiles.name())
+            .collection(MongoCollection::Profiles.name())
+            .find_one(
+                doc! {
+                    "_id": _request.into_inner().user_id,
+                },
+                None,
+            )
+            .await
+            .map_err(|_| Status::internal("Failed to get profile"))?;
+
+        // Build and return the response
+        match profile {
+            Some(profile) => {
+                let profile_dao = bson::from_document::<ProfileDao>(profile)
+                    .map_err(|_| Status::internal("Failed to get profile"))?;
+                Ok(Response::new(profile_dao.as_proto()))
+            }
+            None => Err(Status::not_found("Profile not found")),
+        }
     }
 
     #[tracing::instrument(skip(self))]
@@ -56,7 +81,38 @@ impl ProfileService for ProfileServiceImpl {
         _request: Request<BatchGetProfileRequest>,
     ) -> Result<Response<BatchGetProfileResponse>, Status> {
         info!("Batch-Get Profiles");
-        Err(Status::unimplemented("batch get profiles"))
+
+        // Get the profiles from the database
+        let user_ids = _request.into_inner().user_ids;
+        let mut cursor = self
+            .client
+            .database(MongoDB::Profiles.name())
+            .collection(MongoCollection::Profiles.name())
+            .find(
+                doc! {
+                    "_id": {
+                        "$in": user_ids,
+                    },
+                },
+                None,
+            )
+            .await
+            .map_err(|_| Status::internal("Failed to get profiles"))?;
+
+        // Collect the resulting profiles into a vector
+        let mut profiles = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => match bson::from_document::<ProfileDao>(document) {
+                    Ok(profile_dao) => profiles.push(profile_dao.as_proto()),
+                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
+                },
+                Err(_) => return Err(Status::internal("Failed to get profile")),
+            }
+        }
+
+        // Build and return the response
+        Ok(Response::new(BatchGetProfileResponse { profiles }))
     }
 }
 
@@ -92,5 +148,18 @@ impl ProfileDao {
         }
     }
 
-    // TODO: write a to_profile() function for the protobuf schema
+    fn as_proto(&self) -> Profile {
+        let ts = prost_types::Timestamp {
+            seconds: self.joined_at.time as i64,
+            nanos: 0,
+        };
+
+        Profile {
+            user_id: self.id.clone(),
+            first_name: self.first_name.clone(),
+            last_name: self.last_name.clone(),
+            biography: self.bio.clone(),
+            joined_at: Some(ts),
+        }
+    }
 }

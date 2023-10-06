@@ -78,6 +78,7 @@ services:
 
   profiles-db:
     image: mongo:latest
+    command: --quiet
     ports:
       - "27017:27017"
     healthcheck:

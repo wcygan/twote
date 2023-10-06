@@ -11,6 +11,7 @@ path = "src/main.rs"
 [dependencies]
 schemas = { path = "../schemas" }
 common = { path = "../common" }
+serde.workspace=true
 tracing.workspace=true
 prost-types.workspace=true
 tracing-subscriber.workspace=true

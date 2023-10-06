@@ -1545,6 +1545,7 @@ dependencies = [
  "mongodb",
  "prost-types",
  "schemas",
+ "serde",
  "tokio",
  "tonic",
  "tonic-health",
