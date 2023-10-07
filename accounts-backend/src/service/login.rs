@@ -120,11 +120,11 @@ impl AccountServiceImpl {
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
+        let user_id = user_id.to_string();
         let token = Uuid::new_v4().to_string();
-        self.persist_token(token.clone(), user_id.to_string())
-            .await?;
+        self.persist_token(token.clone(), user_id.clone()).await?;
 
-        Ok(Response::new(LoginResponse { token }))
+        Ok(Response::new(LoginResponse { token, user_id }))
     }
 
     #[tracing::instrument(name = "Get credentials", skip(self))]
