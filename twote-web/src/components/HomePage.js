@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {HelloRequest} from '../proto/hello_pb.js';
-import {HelloServiceClient} from '../proto/hello_grpc_web_pb.js';
+import {GetRandomProfiles} from '../proto/profile_pb.js';
+import { ProfileServiceClient  } from '../proto/profile_grpc_web_pb.js';
 import {authOptions} from '../middleware/AuthInterceptor.js';
 import {Button} from "react-bootstrap";
 
-function HelloComponent() {
+function HomePage() {
     const [response, setResponse] = useState('');
 
     useEffect(() => {
@@ -12,10 +12,9 @@ function HelloComponent() {
     }, []);
 
     const sendRequest = () => {
-        const client = new HelloServiceClient("http://localhost:8080", null, authOptions);
+        const client = new ProfileServiceClient("http://localhost:8080", null, authOptions);
 
-        const request = new HelloRequest();
-        request.setGreeting('Hello from React!');
+        const request = new GetRandomProfiles();
 
         client.sayHello(request, {}, (err, response) => {
             if (err) {
@@ -23,15 +22,19 @@ function HelloComponent() {
                 setResponse('Error: ' + err.message);
             } else {
                 console.log(response);
-                setResponse(response.getReply());
+
+                const profilesList = response.getProfiles.map(profile => {
+                    return profile.getFirstName()
+                });
+
+                setResponse(profilesList);
             }
         });
     };
 
     return (<div>
-            <Button onClick={sendRequest}>Send gRPC Request</Button>
             <p>Response: {response}</p>
         </div>);
 }
 
-export default HelloComponent;
+export default HomePage;
