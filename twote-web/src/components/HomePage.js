@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { GetRandomProfiles } from '../proto/profile_pb.js';
 import { ProfileServiceClient } from '../proto/profile_grpc_web_pb.js';
 import { authOptions } from '../middleware/AuthInterceptor.js';
-import MiniProfile from '../structure/MiniProfile.js'; // Import MiniProfile component
+import MiniProfile from '../structure/MiniProfile.js';
 
 function HomePage() {
     const [profiles, setProfiles] = useState([]);
