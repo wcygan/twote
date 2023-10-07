@@ -3,6 +3,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "protos/hello.proto",
         "protos/account.proto",
         "protos/profile.proto",
+        "protos/tweet.proto",
     ];
 
     tonic_build::configure()

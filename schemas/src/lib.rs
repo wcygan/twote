@@ -11,3 +11,6 @@ pub mod account {
 pub mod profile {
     include!(concat!(env!("OUT_DIR"), "/profile.rs"));
 }
+pub mod tweet {
+    include!(concat!(env!("OUT_DIR"), "/tweet.rs"));
+}

@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package tweet;
+
+service TweetService {
+  rpc Create(CreateTweetRequest) returns (google.protobuf.Empty) {};
+  rpc Get(GetTweetRequest) returns (Tweet) {};
+  rpc BatchGet(BatchTweetRequest) returns (BatchTweetResponse) {};
+  rpc MostRecentTweets(FindMostRecentTweets) returns (BatchTweetResponse) {};
+}
+
+message Tweet {
+  string tweet_id = 1;
+  string user_id = 2;
+  string message = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message CreateTweetRequest {
+  string user_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+}
+
+message GetTweetRequest {
+  string tweet_id = 1;
+}
+
+message FindTweetsByUser {
+  string user_id = 1;
+}
+
+message BatchTweetRequest {
+  repeated string tweet_ids = 1;
+}
+
+message BatchTweetResponse {
+  repeated Tweet Tweets = 1;
+}
+
+message FindMostRecentTweets {
+
+}
