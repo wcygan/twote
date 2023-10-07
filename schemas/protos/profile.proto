@@ -9,6 +9,7 @@ service ProfileService {
   rpc Create(CreateProfileRequest) returns (google.protobuf.Empty) {};
   rpc Get(GetProfileRequest) returns (Profile) {};
   rpc BatchGet(BatchGetProfileRequest) returns (BatchGetProfileResponse) {};
+  rpc RandomProfiles(GetRandomProfiles) returns (BatchGetProfileResponse) {};
 }
 
 message Profile {
@@ -36,3 +37,5 @@ message BatchGetProfileRequest {
 message BatchGetProfileResponse {
   repeated Profile profiles = 1;
 }
+
+message GetRandomProfiles {}

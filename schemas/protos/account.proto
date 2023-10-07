@@ -1,10 +1,12 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package account;
 
 service AccountService {
   rpc Login(LoginRequest) returns (LoginResponse);
-  rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse);
+  rpc CreateAccount(CreateAccountRequest) returns (google.protobuf.Empty) {};
 }
 
 message LoginRequest {
@@ -14,6 +16,7 @@ message LoginRequest {
 
 message LoginResponse {
   string token = 1;
+  string user_id = 2;
 }
 
 message CreateAccountRequest {
@@ -21,8 +24,4 @@ message CreateAccountRequest {
   string password = 2;
   string first_name = 3;
   string last_name = 4;
-}
-
-message CreateAccountResponse {
-  string user_id = 1;
 }
