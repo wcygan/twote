@@ -105,6 +105,18 @@ services:
       timeout: 500ms
       retries: 25
 
+  tweets-backend:
+    build:
+      context: .
+      dockerfile: tweets-backend/Dockerfile
+    ports:
+      - "8084:8084"
+    healthcheck:
+      test: [ "CMD", "grpc-health-probe", "-addr=localhost:8084" ]
+      interval: 300ms
+      timeout: 500ms
+      retries: 25
+
   tweets-db:
     image: mongo:latest
     ports:
