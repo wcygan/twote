@@ -3,7 +3,7 @@ use schemas::profile::profile_service_client::ProfileServiceClient;
 use schemas::profile::profile_service_server::ProfileService;
 use schemas::profile::{
     BatchGetProfileRequest, BatchGetProfileResponse, CreateProfileRequest, GetProfileRequest,
-    Profile,
+    GetRandomProfiles, Profile,
 };
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
@@ -42,6 +42,18 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?
             .batch_get(request)
+            .await
+    }
+
+    async fn random_profiles(
+        &self,
+        request: Request<GetRandomProfiles>,
+    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+        info!("Get Random Profiles");
+        ProfileServiceClient::connect(ProfilesBackend.addr())
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?
+            .random_profiles(request)
             .await
     }
 }
