@@ -1,17 +1,19 @@
-import { ProfileServiceClient } from '../proto/profile_grpc_web_pb.js';
-import { GetProfileRequest } from '../proto/profile_pb.js';
-import {authOptions, MY_USER_ID} from "../middleware/AuthInterceptor";
+import {ProfileServiceClient} from '../proto/profile_grpc_web_pb.js';
+import {GetProfileRequest} from '../proto/profile_pb.js';
+import {authOptions} from "../middleware/AuthInterceptor";
 import React, {useEffect, useState} from "react";
-import Cookies from 'js-cookie';
+import {useParams} from 'react-router-dom';
 
 const ProfilePage = () => {
+    const [userId, setUserId] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [joinedAt, setJoinedAt] = useState('');
     const [bio, setBio] = useState('');
 
+    const { id } = useParams();
+
     useEffect(() => {
-        const id = Cookies.get(MY_USER_ID);
         const client =
             new ProfileServiceClient("http://localhost:8080", null, authOptions);
 
@@ -25,6 +27,7 @@ const ProfilePage = () => {
             }
 
             const date = new Date(response.getJoinedAt().getSeconds() * 1000);
+            setUserId(response.getUserId());
             setFirstName(response.getFirstName());
             setLastName(response.getLastName());
             setBio(response.getBiography());

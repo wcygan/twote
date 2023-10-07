@@ -19,7 +19,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<HomePage/>}/>
                             <Route path="/login" element={<LoginComponent/>}/>
-                            <Route path="/profile" element={<ProfilePage/>}/>
+                            <Route path="/profile/:id" element={<ProfilePage/>}/>
                             <Route path="/create-account" element={<CreateAccountComponent/>}/>
                         </Routes>
                     </Router>
