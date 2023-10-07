@@ -62,7 +62,6 @@ class AuthInterceptor {
     intercept(request, invoker) {
         const metadata = request.getMetadata();
         const token = Cookies.get(AUTH_TOKEN);
-        console.log("adding token to request: " + token);
         metadata.Authorization = token;
         return invoker(request);
     }

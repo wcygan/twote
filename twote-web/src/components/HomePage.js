@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {GetRandomProfiles} from '../proto/profile_pb.js';
-import { ProfileServiceClient  } from '../proto/profile_grpc_web_pb.js';
-import {authOptions} from '../middleware/AuthInterceptor.js';
-import {Button} from "react-bootstrap";
+import React, { useEffect, useState } from 'react';
+import { GetRandomProfiles } from '../proto/profile_pb.js';
+import { ProfileServiceClient } from '../proto/profile_grpc_web_pb.js';
+import { authOptions } from '../middleware/AuthInterceptor.js';
+import { Button } from "react-bootstrap";
 
 function HomePage() {
-    const [response, setResponse] = useState('');
+    const [response, setResponse] = useState([]);
 
     useEffect(() => {
         sendRequest();
@@ -16,15 +16,13 @@ function HomePage() {
 
         const request = new GetRandomProfiles();
 
-        client.sayHello(request, {}, (err, response) => {
+        client.randomProfiles(request, {}, (err, response) => {
             if (err) {
                 console.error(err);
-                setResponse('Error: ' + err.message);
+                setResponse(['Error: ' + err.message]);
             } else {
-                console.log(response);
-
-                const profilesList = response.getProfiles.map(profile => {
-                    return profile.getFirstName()
+                const profilesList = response.getProfilesList().map(profile => {
+                    return profile.getFirstName() + ' ' + profile.getLastName();
                 });
 
                 setResponse(profilesList);
@@ -32,9 +30,14 @@ function HomePage() {
         });
     };
 
-    return (<div>
-            <p>Response: {response}</p>
-        </div>);
+    return (
+        <div>
+            <p>Response:</p>
+            {response.map((profile, index) => (
+                <div key={index}>{profile}</div>
+            ))}
+        </div>
+    );
 }
 
 export default HomePage;
