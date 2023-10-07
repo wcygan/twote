@@ -1,0 +1,15 @@
+[package]
+name = "tweets-backend"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+common = { path = "../common" }
+schemas = { path = "../schemas" }
+tokio.workspace=true
+tonic.workspace=true
+tonic-health.workspace=true
+tracing.workspace=true
+tracing-subscriber.workspace=true

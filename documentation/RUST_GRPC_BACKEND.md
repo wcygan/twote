@@ -34,6 +34,7 @@ Next, you can add any dependencies to the `Cargo.toml` file. A Rust + gRPC servi
 ```toml
 [dependencies]
 common = { path = "../common" }
+schemas = { path = "../schemas" }
 tokio.workspace=true
 tonic.workspace=true
 tonic-health.workspace=true
