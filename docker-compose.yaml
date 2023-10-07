@@ -108,10 +108,7 @@ services:
   tweets-db:
     image: mongo:latest
     ports:
-      - "27018:27018"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: examplepassword
+      - "27018:27017"
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 500ms

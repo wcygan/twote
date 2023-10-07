@@ -4,6 +4,8 @@ docker pull lukemathwalker/cargo-chef:latest-rust-1.72
 
 docker pull node:16
 
+docker pull mongo:latest
+
 docker build -f images/twote-javascript-runtime/Dockerfile -t twote-javascript-runtime .
 
 docker build -f images/twote-rust-builder/Dockerfile -t twote-rust-builder .
