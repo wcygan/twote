@@ -6,6 +6,7 @@ import Footer from "./structure/Footer";
 import Background from "./structure/Background";
 import Header from "./structure/Header";
 import CenterColumn from "./structure/CenterColumn";
+import ProfilePage from "./pages/ProfilePage";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<HelloComponent/>}/>
                             <Route path="/login" element={<LoginComponent/>}/>
+                            <Route path="/profile" element={<ProfilePage/>}/>
                             <Route path="/create-account" element={<CreateAccountComponent/>}/>
                         </Routes>
                     </Router>

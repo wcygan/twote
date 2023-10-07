@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+export const MY_USER_ID = "my-user-id"
 export const AUTH_TOKEN = "authorization-token"
 
 /**

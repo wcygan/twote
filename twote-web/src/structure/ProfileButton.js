@@ -1,16 +1,16 @@
 import React from 'react';
 import {Button} from 'react-bootstrap';
 
-const Home = () => {
+const Profile = () => {
     const handleButtonClick = () => {
-        window.location.href = "/";
+        window.location.href = "/profile";
     };
 
     return (
         <Button onClick={handleButtonClick}>
-            Home
+            Profile
         </Button>
     );
 };
 
-export default Home;
+export default Profile;
