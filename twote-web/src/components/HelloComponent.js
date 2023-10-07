@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {HelloRequest} from '../proto/hello_pb.js';
 import {HelloServiceClient} from '../proto/hello_grpc_web_pb.js';
 import {authOptions} from '../middleware/AuthInterceptor.js';
@@ -6,6 +6,10 @@ import {Button} from "react-bootstrap";
 
 function HelloComponent() {
     const [response, setResponse] = useState('');
+
+    useEffect(() => {
+        sendRequest();
+    }, []);
 
     const sendRequest = () => {
         const client = new HelloServiceClient("http://localhost:8080", null, authOptions);
