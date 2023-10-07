@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
 import { LoginRequest } from '../proto/account_pb.js';
 import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
-import { AUTH_TOKEN} from '../middleware/AuthInterceptor.js';
+import { AUTH_TOKEN, MY_USER_ID } from '../middleware/AuthInterceptor.js';
 import Cookies from 'js-cookie';
 
 function LoginComponent() {
@@ -24,8 +24,8 @@ function LoginComponent() {
                 console.error(err);
                 setResponse('Error: ' + err.message);
             } else {
-                console.log(response);
                 Cookies.set(AUTH_TOKEN, response.getToken());
+                Cookies.set(MY_USER_ID, response.getUserId());
                 navigate('/');
             }
         });

@@ -1,5 +1,6 @@
 import Cookies from 'js-cookie';
 
+export const MY_USER_ID = "my-user-id"
 export const AUTH_TOKEN = "authorization-token"
 
 /**
@@ -61,7 +62,6 @@ class AuthInterceptor {
     intercept(request, invoker) {
         const metadata = request.getMetadata();
         const token = Cookies.get(AUTH_TOKEN);
-        console.log("adding token to request: " + token);
         metadata.Authorization = token;
         return invoker(request);
     }

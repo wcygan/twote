@@ -26,7 +26,6 @@ function CreateAccountComponent() {
                 console.error(err);
                 setResponse('Error: ' + err.message);
             } else {
-                console.log(response);
                 navigate('/login');
             }
         });

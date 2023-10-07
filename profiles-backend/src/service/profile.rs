@@ -9,7 +9,7 @@ use tracing::info;
 use schemas::profile::profile_service_server::ProfileService;
 use schemas::profile::{
     BatchGetProfileRequest, BatchGetProfileResponse, CreateProfileRequest, GetProfileRequest,
-    Profile,
+    GetRandomProfiles, Profile,
 };
 
 pub struct ProfileServiceImpl {
@@ -99,6 +99,34 @@ impl ProfileService for ProfileServiceImpl {
                 },
                 None,
             )
+            .await
+            .map_err(|_| Status::internal("Failed to get profiles"))?;
+
+        // Collect the resulting profiles into a vector
+        let mut profiles = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => match bson::from_document::<ProfileDao>(document) {
+                    Ok(profile_dao) => profiles.push(profile_dao.as_proto()),
+                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
+                },
+                Err(_) => return Err(Status::internal("Failed to get profile")),
+            }
+        }
+
+        // Build and return the response
+        Ok(Response::new(BatchGetProfileResponse { profiles }))
+    }
+
+    async fn random_profiles(
+        &self,
+        _request: Request<GetRandomProfiles>,
+    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+        let mut cursor = self
+            .client
+            .database(MongoDB::Profiles.name())
+            .collection(MongoCollection::Profiles.name())
+            .find(None, None)
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
