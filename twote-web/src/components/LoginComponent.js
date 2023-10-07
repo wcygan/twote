@@ -24,10 +24,8 @@ function LoginComponent() {
                 console.error(err);
                 setResponse('Error: ' + err.message);
             } else {
-                console.log(response);
                 Cookies.set(AUTH_TOKEN, response.getToken());
-                Cookies.set(MY_USER_ID, response.getToken());
-
+                Cookies.set(MY_USER_ID, response.getUserId());
                 navigate('/');
             }
         });
