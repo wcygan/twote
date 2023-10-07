@@ -1540,7 +1540,6 @@ dependencies = [
 name = "profiles-backend"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "common",
  "mongodb",
  "prost-types",
