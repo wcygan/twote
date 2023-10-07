@@ -12,7 +12,6 @@ use common::spawn_blocking_with_tracing;
 use common::Service::ProfilesBackend;
 use schemas::account::account_service_server::AccountService;
 use schemas::account::CreateAccountRequest;
-use schemas::account::CreateAccountResponse;
 use schemas::account::{LoginRequest, LoginResponse};
 use schemas::profile::profile_service_client::ProfileServiceClient;
 use schemas::profile::CreateProfileRequest;
@@ -61,7 +60,7 @@ impl AccountService for AccountServiceImpl {
     async fn create_account(
         &self,
         request: Request<CreateAccountRequest>,
-    ) -> Result<Response<CreateAccountResponse>, Status> {
+    ) -> Result<Response<()>, Status> {
         info!("Processing CreateAccountRequest");
         let request = request.into_inner();
         let data = create_account_data(&request).await?;
@@ -70,7 +69,7 @@ impl AccountService for AccountServiceImpl {
         match self.persist_credentials(data).await {
             Ok(result) => {
                 let create_profile_request = CreateProfileRequest {
-                    user_id: result.user_id.clone(),
+                    user_id: result.clone(),
                     first_name: request.first_name,
                     last_name: request.last_name,
                 };
@@ -81,7 +80,7 @@ impl AccountService for AccountServiceImpl {
                     .create(Request::new(create_profile_request))
                     .await?;
 
-                Ok(Response::new(result))
+                Ok(Response::new(()))
             }
             Err(e) => {
                 return Err(e);
@@ -96,7 +95,7 @@ impl AccountServiceImpl {
     }
 
     #[tracing::instrument(name = "Persist credentials", skip(self))]
-    async fn persist_credentials(&self, data: Account) -> Result<CreateAccountResponse, Status> {
+    async fn persist_credentials(&self, data: Account) -> Result<String, Status> {
         sqlx::query!(
             "INSERT INTO users (user_id, username, password_hash)
             VALUES ($1, $2, $3)",
@@ -106,9 +105,7 @@ impl AccountServiceImpl {
         )
         .execute(&self.pool)
         .await
-        .map(|_| CreateAccountResponse {
-            user_id: data.user_id.to_string(),
-        })
+        .map(|_| data.user_id.to_string())
         .map_err(|e| Status::new(Code::AlreadyExists, e.to_string()))
     }
 
