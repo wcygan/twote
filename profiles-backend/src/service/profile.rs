@@ -16,15 +16,6 @@ pub struct ProfileServiceImpl {
     client: mongodb::Client,
 }
 
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct ProfileDao {
-    _id: String,
-    first_name: String,
-    last_name: String,
-    bio: String,
-    joined_at: bson::Timestamp,
-}
-
 #[tonic::async_trait]
 impl ProfileService for ProfileServiceImpl {
     #[tracing::instrument(skip(self))]
@@ -32,7 +23,7 @@ impl ProfileService for ProfileServiceImpl {
         info!("Creating Profile");
 
         // Insert the profile into the database
-        let bson_data = ProfileDao::create_from(request.into_inner()).to_bson();
+        let bson_data: bson::Document = ProfileDao::create_from(request.into_inner()).into();
         self.client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -69,7 +60,7 @@ impl ProfileService for ProfileServiceImpl {
                     info!("Failed to deserialize profile: {:?}", e);
                     Status::internal("Failed to get profile")
                 })?;
-                Ok(Response::new(profile_dao.as_proto()))
+                Ok(Response::new(profile_dao.into()))
             }
             None => Err(Status::not_found("Profile not found")),
         }
@@ -104,7 +95,7 @@ impl ProfileService for ProfileServiceImpl {
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.as_proto()),
+                    Ok(profile_dao) => profiles.push(profile_dao.into()),
                     Err(_) => return Err(Status::internal("Failed to deserialize profile")),
                 },
                 Err(_) => return Err(Status::internal("Failed to get profile")),
@@ -133,7 +124,7 @@ impl ProfileService for ProfileServiceImpl {
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.as_proto()),
+                    Ok(profile_dao) => profiles.push(profile_dao.into()),
                     Err(_) => return Err(Status::internal("Failed to deserialize profile")),
                 },
                 Err(_) => return Err(Status::internal("Failed to get profile")),
@@ -151,6 +142,44 @@ impl ProfileServiceImpl {
     }
 }
 
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+struct ProfileDao {
+    _id: String,
+    first_name: String,
+    last_name: String,
+    bio: String,
+    joined_at: bson::Timestamp,
+}
+
+impl Into<Profile> for ProfileDao {
+    fn into(self) -> Profile {
+        let ts = prost_types::Timestamp {
+            seconds: self.joined_at.time as i64,
+            nanos: 0,
+        };
+
+        Profile {
+            user_id: self._id,
+            first_name: self.first_name,
+            last_name: self.last_name,
+            biography: self.bio,
+            joined_at: Some(ts),
+        }
+    }
+}
+
+impl Into<bson::Document> for ProfileDao {
+    fn into(self) -> bson::Document {
+        doc! {
+            "_id": &self._id,
+            "first_name": &self.first_name,
+            "last_name": &self.last_name,
+            "bio": &self.bio,
+            "joined_at": &self.joined_at,
+        }
+    }
+}
+
 impl ProfileDao {
     fn create_from(request: CreateProfileRequest) -> Self {
         let ts = bson::Timestamp {
@@ -164,31 +193,6 @@ impl ProfileDao {
             last_name: request.last_name,
             bio: String::new(),
             joined_at: ts,
-        }
-    }
-
-    fn to_bson(&self) -> bson::Document {
-        doc! {
-            "_id": &self._id,
-            "first_name": &self.first_name,
-            "last_name": &self.last_name,
-            "bio": &self.bio,
-            "joined_at": &self.joined_at,
-        }
-    }
-
-    fn as_proto(self) -> Profile {
-        let ts = prost_types::Timestamp {
-            seconds: self.joined_at.time as i64,
-            nanos: 0,
-        };
-
-        Profile {
-            user_id: self._id,
-            first_name: self.first_name,
-            last_name: self.last_name,
-            biography: self.bio,
-            joined_at: Some(ts),
         }
     }
 }
