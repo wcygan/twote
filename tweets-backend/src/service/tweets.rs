@@ -75,16 +75,16 @@ impl TweetsDao{
             created_at,
         }
     }
-    fn as_proto(&self) -> Tweet {
+    fn as_proto(self) -> Tweet {
         let ts = prost_types::Timestamp {
             seconds: self.created_at.time as i64,
             nanos: 0,
         };
 
         Tweet {
-            tweet_id: self._id.clone(),
-            user_id: self.user_id.clone(),
-            message: self.message.clone(),
+            tweet_id: self._id,
+            user_id: self.user_id,
+            message: self.message,
             created_at: Some(ts),
         }
     }

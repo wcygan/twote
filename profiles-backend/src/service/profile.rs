@@ -179,17 +179,17 @@ impl ProfileDao {
         }
     }
 
-    fn as_proto(&self) -> Profile {
+    fn as_proto(self) -> Profile {
         let ts = prost_types::Timestamp {
             seconds: self.joined_at.time as i64,
             nanos: 0,
         };
 
         Profile {
-            user_id: self._id.clone(),
-            first_name: self.first_name.clone(),
-            last_name: self.last_name.clone(),
-            biography: self.bio.clone(),
+            user_id: self._id,
+            first_name: self.first_name,
+            last_name: self.last_name,
+            biography: self.bio,
             joined_at: Some(ts),
         }
     }
