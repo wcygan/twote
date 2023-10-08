@@ -33,7 +33,7 @@ impl TweetServiceImpl {
 #[tonic::async_trait]
 impl TweetService for TweetServiceImpl {
     async fn create(&self, request: Request<CreateTweetRequest>) -> Result<Response<()>, Status> {
-        info!("Creating Profile");
+        info!("Creating Tweet");
 
         // Insert the profile into the database
         let bson_data = TweetsDao::create_from(request.into_inner()).to_bson();
