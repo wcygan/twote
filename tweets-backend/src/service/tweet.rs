@@ -3,6 +3,7 @@ use std::time::Instant;
 use mongodb::bson;
 use mongodb::bson::doc;
 use tonic::{Request, Response, Status};
+use tonic::codegen::tokio_stream::StreamExt;
 use tracing::info;
 use uuid::Uuid;
 
@@ -25,21 +26,22 @@ impl TweetServiceImpl {
 
 #[tonic::async_trait]
 impl TweetService for TweetServiceImpl {
+    #[tracing::instrument(skip(self))]
     async fn create(&self, request: Request<CreateTweetRequest>) -> Result<Response<()>, Status> {
         info!("Creating Tweet");
 
-        // Insert the profile into the database
+        // Insert the tweet into the database
         let tweet: bson::Document = TweetsDao::create_from(request.into_inner()).into();
         self.client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
             .insert_one(tweet, None)
             .await
-            .map_err(|_| Status::internal("Failed to create profile"))?;
+            .map_err(|_| Status::internal("Failed to create tweet"))?;
 
         Ok(Response::new(()))
     }
-
+    #[tracing::instrument(skip(self))]
     async fn get(&self, request: Request<GetTweetRequest>) -> Result<Response<Tweet>, Status> {
         info!("Getting Tweet");
 
@@ -58,21 +60,75 @@ impl TweetService for TweetServiceImpl {
 
         Ok(Response::new(tweet.into()))
     }
-
+    #[tracing::instrument(skip(self))]
     async fn batch_get(
         &self,
         _request: Request<BatchTweetRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        unimplemented!()
+        info!("Batch-get Tweets");
+
+        let tweet_id = _request.into_inner().tweet_ids;
+        let mut cursor = self.client
+            .database(MongoDB::Tweets.name())
+            .collection(MongoCollection::Tweets.name())
+            .find(
+                doc! {
+                    "_id": {
+                        "$in": tweet_id,
+                    },
+                },
+                None,
+            )
+            .await
+            .map_err(|_| Status::internal("Failed to batch get tweets"))?;
+
+        // Collect the resulting tweets into a vector/list
+        let mut tweets = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => match bson::from_document::<TweetsDao>(document) {
+                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
+                    Err(_) => return Err(Status::internal("Failed to deserialize tweet")),
+                },
+                Err(_) => return Err(Status::internal("Failed to get tweet")),
+            }
+        }
+
+        // Build and return the response
+        Ok(Response::new(BatchTweetResponse { tweets }))
+
     }
 
+    #[tracing::instrument(skip(self))]
     async fn find_most_recent_tweets(
         &self,
         _request: Request<FindMostRecentTweetsRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        unimplemented!()
+        let mut cursor = self
+            .client
+            .database(MongoDB::Tweets.name())
+            .collection(MongoCollection::Tweets.name())
+            .find(None, None)
+            .await
+            .map_err(|_| Status::internal("Failed to get tweets"))?;
+
+        // Collect the resulting tweets into a vector/list
+        let mut tweets = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => match bson::from_document::<TweetsDao>(document) {
+                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
+                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
+                },
+                Err(_) => return Err(Status::internal("Failed to get profile")),
+            }
+        }
+
+        // Build and return the response
+        Ok(Response::new(BatchTweetResponse { tweets }))
     }
 
+    #[tracing::instrument(skip(self))]
     async fn find_most_recent_tweets_by_user(
         &self,
         _request: Request<FindMostRecentTweetsByUserRequest>,
