@@ -1,12 +1,12 @@
 mod service;
 
-use common::Service::{TweetsBackend};
+use crate::service::tweets::TweetServiceImpl;
 use common::MongoDB;
+use common::Service::TweetsBackend;
+
+use schemas::tweet::tweet_service_server::TweetServiceServer;
 use tonic::transport::Server;
 use tracing::info;
-use mongodb::{options::ClientOptions, Client};
-use schemas::tweet::tweet_service_server::TweetServiceServer;
-use crate::service::tweets::TweetServiceImpl;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -1,23 +1,23 @@
-use tonic::{Request, Response, Status};
+use std::time::Instant;
+
 use mongodb::bson;
 use mongodb::bson::doc;
-use std::time::Instant;
-use tonic::codegen::tokio_stream::StreamExt;
+use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
-use common::{MongoCollection, MongoDB};
 
-use schemas::tweet::{
-    Tweet, CreateTweetRequest, GetTweetRequest, FindTweetsByUser,
-    BatchTweetRequest,BatchTweetResponse, FindMostRecentTweets,
-};
+use common::{MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
+use schemas::tweet::{
+    BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweets,
+    GetTweetRequest, Tweet,
+};
 
 pub struct TweetServiceImpl {
     client: mongodb::Client,
 }
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-struct TweetsDao  {
+struct TweetsDao {
     _id: String,
     user_id: String,
     message: String,
@@ -47,21 +47,26 @@ impl TweetService for TweetServiceImpl {
         Ok(Response::new(()))
     }
 
-    async fn get(&self, request: Request<GetTweetRequest>) -> Result<Response<Tweet>, Status> {
+    async fn get(&self, _request: Request<GetTweetRequest>) -> Result<Response<Tweet>, Status> {
         unimplemented!()
     }
 
-    async fn batch_get(&self, request: Request<BatchTweetRequest>) -> Result<Response<BatchTweetResponse>, Status> {
+    async fn batch_get(
+        &self,
+        _request: Request<BatchTweetRequest>,
+    ) -> Result<Response<BatchTweetResponse>, Status> {
         unimplemented!()
     }
 
-    async fn most_recent_tweets(&self, request: Request<FindMostRecentTweets>) -> Result<Response<BatchTweetResponse>, Status> {
+    async fn most_recent_tweets(
+        &self,
+        _request: Request<FindMostRecentTweets>,
+    ) -> Result<Response<BatchTweetResponse>, Status> {
         unimplemented!()
     }
-
 }
 
-impl TweetsDao{
+impl TweetsDao {
     fn create_from(request: CreateTweetRequest) -> Self {
         let created_at = bson::Timestamp {
             time: Instant::now().elapsed().as_secs() as u32,
@@ -98,5 +103,3 @@ impl TweetsDao{
         }
     }
 }
-
-

@@ -28,10 +28,7 @@ struct ProfileDao {
 #[tonic::async_trait]
 impl ProfileService for ProfileServiceImpl {
     #[tracing::instrument(skip(self))]
-    async fn create(
-        &self,
-        request: Request<CreateProfileRequest>,
-    ) -> Result<Response<()>, Status> {
+    async fn create(&self, request: Request<CreateProfileRequest>) -> Result<Response<()>, Status> {
         info!("Creating Profile");
 
         // Insert the profile into the database
