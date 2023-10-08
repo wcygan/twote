@@ -2,8 +2,8 @@ use common::Service::ProfilesBackend;
 use schemas::profile::profile_service_client::ProfileServiceClient;
 use schemas::profile::profile_service_server::ProfileService;
 use schemas::profile::{
-    BatchGetProfileRequest, BatchGetProfileResponse, CreateProfileRequest, GetProfileRequest,
-    GetRandomProfiles, Profile,
+    BatchGetProfileRequest, BatchProfileResponse, CreateProfileRequest,
+    FindMostRecentProfilesRequest, GetProfileRequest, Profile,
 };
 use tonic::{Code, Request, Response, Status};
 use tracing::info;
@@ -36,7 +36,7 @@ impl ProfileService for ProfileServiceImpl {
     async fn batch_get(
         &self,
         request: Request<BatchGetProfileRequest>,
-    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+    ) -> Result<Response<BatchProfileResponse>, Status> {
         info!("Batch-Get Profiles");
         ProfileServiceClient::connect(ProfilesBackend.addr())
             .await
@@ -45,15 +45,16 @@ impl ProfileService for ProfileServiceImpl {
             .await
     }
 
-    async fn random_profiles(
+    #[tracing::instrument(skip(self))]
+    async fn find_most_recent_profiles(
         &self,
-        request: Request<GetRandomProfiles>,
-    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+        request: Request<FindMostRecentProfilesRequest>,
+    ) -> Result<Response<BatchProfileResponse>, Status> {
         info!("Get Random Profiles");
         ProfileServiceClient::connect(ProfilesBackend.addr())
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?
-            .random_profiles(request)
+            .find_most_recent_profiles(request)
             .await
     }
 }

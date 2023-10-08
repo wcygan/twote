@@ -8,8 +8,8 @@ use tracing::info;
 
 use schemas::profile::profile_service_server::ProfileService;
 use schemas::profile::{
-    BatchGetProfileRequest, BatchGetProfileResponse, CreateProfileRequest, GetProfileRequest,
-    GetRandomProfiles, Profile,
+    BatchGetProfileRequest, BatchProfileResponse, CreateProfileRequest,
+    FindMostRecentProfilesRequest, GetProfileRequest, Profile,
 };
 
 pub struct ProfileServiceImpl {
@@ -79,7 +79,7 @@ impl ProfileService for ProfileServiceImpl {
     async fn batch_get(
         &self,
         _request: Request<BatchGetProfileRequest>,
-    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+    ) -> Result<Response<BatchProfileResponse>, Status> {
         info!("Batch-Get Profiles");
 
         // Get the profiles from the database
@@ -112,13 +112,14 @@ impl ProfileService for ProfileServiceImpl {
         }
 
         // Build and return the response
-        Ok(Response::new(BatchGetProfileResponse { profiles }))
+        Ok(Response::new(BatchProfileResponse { profiles }))
     }
 
-    async fn random_profiles(
+    #[tracing::instrument(skip(self))]
+    async fn find_most_recent_profiles(
         &self,
-        _request: Request<GetRandomProfiles>,
-    ) -> Result<Response<BatchGetProfileResponse>, Status> {
+        _request: Request<FindMostRecentProfilesRequest>,
+    ) -> Result<Response<BatchProfileResponse>, Status> {
         let mut cursor = self
             .client
             .database(MongoDB::Profiles.name())
@@ -140,7 +141,7 @@ impl ProfileService for ProfileServiceImpl {
         }
 
         // Build and return the response
-        Ok(Response::new(BatchGetProfileResponse { profiles }))
+        Ok(Response::new(BatchProfileResponse { profiles }))
     }
 }
 
