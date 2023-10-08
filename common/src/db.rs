@@ -12,10 +12,7 @@ impl MongoDB {
     }
 
     pub fn uri(&self) -> String {
-        match self {
-            Self::Profiles => format!("mongodb://{}:27017", self.name()),
-            Self::Tweets => format!("mongodb://{}:27018", self.name()),
-        }
+        format!("mongodb://{}:27017", self.name())
     }
 }
 

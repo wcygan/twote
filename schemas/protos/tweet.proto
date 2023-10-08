@@ -21,8 +21,7 @@ message Tweet {
 
 message CreateTweetRequest {
   string user_id = 1;
-  string first_name = 2;
-  string last_name = 3;
+  string message = 2;
 }
 
 message GetTweetRequest {

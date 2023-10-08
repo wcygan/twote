@@ -17,3 +17,5 @@ tracing.workspace=true
 tracing-subscriber.workspace=true
 mongodb.workspace=true
 serde.workspace=true
+uuid.workspace=true
+prost-types.workspace=true

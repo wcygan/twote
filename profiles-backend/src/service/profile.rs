@@ -30,12 +30,12 @@ impl ProfileService for ProfileServiceImpl {
     #[tracing::instrument(skip(self))]
     async fn create(
         &self,
-        _request: Request<CreateProfileRequest>,
+        request: Request<CreateProfileRequest>,
     ) -> Result<Response<()>, Status> {
         info!("Creating Profile");
 
         // Insert the profile into the database
-        let bson_data = ProfileDao::create_from(_request.into_inner()).to_bson();
+        let bson_data = ProfileDao::create_from(request.into_inner()).to_bson();
         self.client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())

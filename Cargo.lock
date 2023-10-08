@@ -2718,6 +2718,7 @@ version = "0.1.0"
 dependencies = [
  "common",
  "mongodb",
+ "prost-types",
  "schemas",
  "serde",
  "tokio",
@@ -2725,6 +2726,7 @@ dependencies = [
  "tonic-health",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]
