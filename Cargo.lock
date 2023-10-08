@@ -2717,7 +2717,9 @@ name = "tweets-backend"
 version = "0.1.0"
 dependencies = [
  "common",
+ "mongodb",
  "schemas",
+ "serde",
  "tokio",
  "tonic",
  "tonic-health",

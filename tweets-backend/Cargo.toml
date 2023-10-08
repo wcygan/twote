@@ -15,3 +15,5 @@ tonic.workspace=true
 tonic-health.workspace=true
 tracing.workspace=true
 tracing-subscriber.workspace=true
+mongodb.workspace=true
+serde.workspace=true
