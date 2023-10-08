@@ -25,7 +25,7 @@ impl MongoCollection {
     pub fn name(&self) -> &str {
         match self {
             Self::Profiles => "profiles",
-            Self::Tweets =>  "tweets",
+            Self::Tweets => "tweets",
         }
     }
 }
