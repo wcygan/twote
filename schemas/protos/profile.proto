@@ -16,7 +16,7 @@ service ProfileService {
   // Get multiple profiles by user ID.
   rpc BatchGet(BatchGetProfileRequest) returns (BatchProfileResponse) {};
 
-  // Get a random set of profiles.
+  // Find the most recently created profiles.
   rpc FindMostRecentProfiles(FindMostRecentProfilesRequest) returns (BatchProfileResponse) {};
 }
 
@@ -68,5 +68,5 @@ message BatchProfileResponse {
   repeated Profile profiles = 1;
 }
 
-// Request to find the most recent profiles.
+// Request to find the most recently created profiles.
 message FindMostRecentProfilesRequest {}
