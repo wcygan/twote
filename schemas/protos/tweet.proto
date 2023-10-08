@@ -40,6 +40,4 @@ message BatchTweetResponse {
   repeated Tweet Tweets = 1;
 }
 
-message FindMostRecentTweets {
-
-}
+message FindMostRecentTweets {}

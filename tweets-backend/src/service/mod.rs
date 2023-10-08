@@ -1,1 +1,1 @@
-pub mod tweets;
+pub mod tweet;

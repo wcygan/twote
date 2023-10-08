@@ -1,6 +1,6 @@
 mod service;
 
-use crate::service::tweets::TweetServiceImpl;
+use crate::service::tweet::TweetServiceImpl;
 use common::MongoDB;
 use common::Service::TweetsBackend;
 
