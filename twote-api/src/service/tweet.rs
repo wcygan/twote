@@ -5,8 +5,8 @@ use common::Service::TweetsBackend;
 use schemas::tweet::tweet_service_client::TweetServiceClient;
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
-    BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweets,
-    GetTweetRequest, Tweet,
+    BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
+    FindMostRecentTweetsRequest, GetTweetRequest, Tweet,
 };
 
 pub struct TweetServiceImpl;
@@ -43,15 +43,27 @@ impl TweetService for TweetServiceImpl {
             .await
     }
 
-    async fn most_recent_tweets(
+    async fn find_most_recent_tweets(
         &self,
-        request: Request<FindMostRecentTweets>,
+        request: Request<FindMostRecentTweetsRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
         info!("Get Most Recent Tweets");
         TweetServiceClient::connect(TweetsBackend.addr())
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?
-            .most_recent_tweets(request)
+            .find_most_recent_tweets(request)
+            .await
+    }
+
+    async fn find_most_recent_tweets_by_user(
+        &self,
+        request: Request<FindMostRecentTweetsByUserRequest>,
+    ) -> Result<Response<BatchTweetResponse>, Status> {
+        info!("Get Most Recent Tweets By User");
+        TweetServiceClient::connect(TweetsBackend.addr())
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?
+            .find_most_recent_tweets_by_user(request)
             .await
     }
 }

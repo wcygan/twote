@@ -5,39 +5,71 @@ import "google/protobuf/empty.proto";
 
 package tweet;
 
+// The service responsible for managing tweets.
 service TweetService {
+  // Create a tweet.
   rpc Create(CreateTweetRequest) returns (google.protobuf.Empty) {};
+
+  // Get a tweet.
   rpc Get(GetTweetRequest) returns (Tweet) {};
+
+  // Get a batch of tweets.
   rpc BatchGet(BatchTweetRequest) returns (BatchTweetResponse) {};
-  rpc MostRecentTweets(FindMostRecentTweets) returns (BatchTweetResponse) {};
+
+  // Get the most recent tweets by all users.
+  rpc FindMostRecentTweets(FindMostRecentTweetsRequest) returns (BatchTweetResponse) {};
+
+  // Get the most recent tweets by a user.
+  rpc FindMostRecentTweetsByUser(FindMostRecentTweetsByUserRequest) returns (BatchTweetResponse) {};
 }
 
+// A tweet is a message posted by a user.
 message Tweet {
+  // The ID of the tweet.
   string tweet_id = 1;
+
+  // The ID of the user who posted the tweet.
   string user_id = 2;
+
+  // The message of the tweet.
   string message = 3;
+
+  // The time the tweet was created.
   google.protobuf.Timestamp created_at = 4;
 }
 
+// A response containing a batch of tweets.
+message BatchTweetResponse {
+  // A batch of tweets.
+  repeated Tweet tweets = 1;
+}
+
+// A request to create a tweet.
 message CreateTweetRequest {
+  // The ID of the user who posted the tweet.
   string user_id = 1;
+
+  // The message of the tweet.
   string message = 2;
 }
 
+// A request to get a tweet.
 message GetTweetRequest {
+  // The ID of the tweet to get.
   string tweet_id = 1;
 }
 
-message FindTweetsByUser {
-  string user_id = 1;
-}
-
+// A request to get a batch of tweets by tweet ID.
 message BatchTweetRequest {
+  // The IDs of the tweets to get.
   repeated string tweet_ids = 1;
 }
 
-message BatchTweetResponse {
-  repeated Tweet Tweets = 1;
+// A request to get the most recent tweets by a user.
+message FindMostRecentTweetsByUserRequest {
+  // The ID of the user to get the most recent tweets for.
+  string user_id = 1;
 }
 
-message FindMostRecentTweets {}
+// A request to get the most recent tweets by all users.
+message FindMostRecentTweetsRequest {}

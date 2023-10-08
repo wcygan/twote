@@ -9,8 +9,8 @@ use uuid::Uuid;
 use common::{MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
-    BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweets,
-    GetTweetRequest, Tweet,
+    BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
+    FindMostRecentTweetsRequest, GetTweetRequest, Tweet,
 };
 
 pub struct TweetServiceImpl {
@@ -58,9 +58,16 @@ impl TweetService for TweetServiceImpl {
         unimplemented!()
     }
 
-    async fn most_recent_tweets(
+    async fn find_most_recent_tweets(
         &self,
-        _request: Request<FindMostRecentTweets>,
+        _request: Request<FindMostRecentTweetsRequest>,
+    ) -> Result<Response<BatchTweetResponse>, Status> {
+        unimplemented!()
+    }
+
+    async fn find_most_recent_tweets_by_user(
+        &self,
+        _request: Request<FindMostRecentTweetsByUserRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
         unimplemented!()
     }
