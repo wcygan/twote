@@ -2,8 +2,8 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
-use tonic::{Request, Response, Status};
 use tonic::codegen::tokio_stream::StreamExt;
+use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 
@@ -68,7 +68,8 @@ impl TweetService for TweetServiceImpl {
         info!("Batch-get Tweets");
 
         let tweet_id = _request.into_inner().tweet_ids;
-        let mut cursor = self.client
+        let mut cursor = self
+            .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
             .find(
@@ -135,7 +136,8 @@ impl TweetService for TweetServiceImpl {
         info!("Find Most Recent Tweets By User");
 
         let user_id = _request.into_inner().user_id;
-        let mut cursor = self.client
+        let mut cursor = self
+            .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
             .find(
@@ -161,8 +163,8 @@ impl TweetService for TweetServiceImpl {
 
         // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
-        }
     }
+}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct TweetsDao {
