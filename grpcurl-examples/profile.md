@@ -1,4 +1,4 @@
-[grpcurl](https://github.com/fullstorydev/grpcurl) examples for [profile.proto](../schemas/protos/profile.proto)
+[grpcurl](https://github.com/fullstorydev/grpcurl) examples for [profile.proto](../schemas/protos/backend/profile.proto)
 
 ## Create
 

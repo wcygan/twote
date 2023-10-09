@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { FindMostRecentProfilesRequest } from '../proto/profile_pb.js';
-import { ProfileServiceClient } from '../proto/profile_grpc_web_pb.js';
+import { FindMostRecentProfilesRequest } from '../proto/backend/profile_pb.js';
+import { ProfileServiceClient } from '../proto/backend/profile_grpc_web_pb.js';
 import { authOptions } from '../middleware/AuthInterceptor.js';
 import MiniProfile from '../structure/MiniProfile.js';
 

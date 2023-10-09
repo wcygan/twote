@@ -1,5 +1,5 @@
-import {ProfileServiceClient} from '../proto/profile_grpc_web_pb.js';
-import {GetProfileRequest} from '../proto/profile_pb.js';
+import {ProfileServiceClient} from '../proto/backend/profile_grpc_web_pb.js';
+import {GetProfileRequest} from '../proto/backend/profile_pb.js';
 import {authOptions} from "../middleware/AuthInterceptor";
 import React, {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom';

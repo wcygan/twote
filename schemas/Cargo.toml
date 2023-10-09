@@ -14,3 +14,4 @@ tonic.workspace = true
 
 [build-dependencies]
 tonic-build = "0.10.0"
+glob.workspace = true

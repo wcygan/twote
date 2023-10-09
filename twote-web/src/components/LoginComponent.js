@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
-import { LoginRequest } from '../proto/account_pb.js';
-import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
+import { LoginRequest } from '../proto/frontend/account_pb.js';
+import { AccountServiceClient } from '../proto/frontend/account_grpc_web_pb.js';
 import { AUTH_TOKEN, MY_USER_ID } from '../middleware/AuthInterceptor.js';
 import Cookies from 'js-cookie';
 
