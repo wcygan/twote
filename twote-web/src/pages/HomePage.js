@@ -5,6 +5,7 @@ import { authOptions } from '../middleware/AuthInterceptor.js';
 import Tweet from "../content/Tweet";
 import MiniProfile from "../content/MiniProfile";
 import './HomePage.css';
+import TweetBoxComponent from "../components/TweetBoxComponent";
 
 function HomePage() {
     const [tweets, setTweets] = useState([]);
@@ -32,6 +33,7 @@ function HomePage() {
     return (
         <div className="homepage">
             <div className="tweets-column">
+                <TweetBoxComponent />
                 <h3>Recent Tweets</h3>
                 {tweets.map((tweet, index) => (
                     <Tweet
