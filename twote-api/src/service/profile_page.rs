@@ -18,10 +18,11 @@ impl ProfilePageService for ProfilePageServiceImpl {
         request: Request<GetProfilePageRequest>,
     ) -> Result<Response<ProfilePage>, Status> {
         let user_id = request.into_inner().user_id;
-        let profile = self.get_profile(user_id.clone()).await?;
-        let tweets = self
-            .find_most_recent_tweets_by_profile(user_id)
-            .await?
+        let profile_task = self.get_profile(user_id.clone());
+        let tweets_task = self.find_most_recent_tweets_by_profile(user_id);
+        let (profile, tweets) = tokio::join!(profile_task, tweets_task);
+        let profile = profile?;
+        let tweets = tweets?
             .into_iter()
             .map(|tweet| tweet_details(tweet, &profile))
             .collect();
