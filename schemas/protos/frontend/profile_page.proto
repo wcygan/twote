@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
 import "frontend/tweet.proto";
+import "backend/profile.proto";
 
 package frontend;
 
@@ -10,25 +10,13 @@ service ProfilePageService {
   rpc GetProfilePage(GetProfilePageRequest) returns (ProfilePage);
 }
 
-// A user profile page.
+// The user's profile page.
 message ProfilePage {
-  // The user ID.
-  string user_id = 1;
-
-  // The user's first name.
-  string first_name = 2;
-
-  // The user's last name.
-  string last_name = 3;
-
-  // The user's biography.
-  string biography = 4;
-
-  // The date the user joined.
-  google.protobuf.Timestamp joined_at = 5;
+  // The user's profile information.
+  profile.Profile profile = 1;
 
   // The user's Tweets.
-  repeated Tweet tweets = 6;
+  repeated Tweet tweets = 2;
 }
 
 // Request for getting a user's profile page.

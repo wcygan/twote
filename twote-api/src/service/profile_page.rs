@@ -28,11 +28,7 @@ impl ProfilePageService for ProfilePageServiceImpl {
             .collect();
 
         let profile_page = ProfilePage {
-            user_id: profile.user_id,
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            biography: profile.biography,
-            joined_at: profile.joined_at,
+            profile: Some(profile),
             tweets,
         };
 

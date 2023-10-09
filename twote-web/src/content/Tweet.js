@@ -2,6 +2,7 @@ import React from 'react';
 import {date_from_seconds} from "../common/DateUtil";
 
 function Tweet({ tweet }) {
+    console.log(tweet);
     return (
         <div className="tweet">
             <div className="tweet-header">

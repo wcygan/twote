@@ -19,15 +19,8 @@ function HomePage() {
         client.findMostRecentProfiles(request, {}, (err, response) => {
             if (err) {
                 console.error(err);
-                setProfiles([{ firstName: 'Error', lastName: err.message }]);
             } else {
-                const profilesList = response.getProfilesList().map(profile => ({
-                    id: profile.getUserId(), // Extract user ID
-                    firstName: profile.getFirstName(),
-                    lastName: profile.getLastName(),
-                }));
-
-                setProfiles(profilesList);
+                setProfiles(response.getProfilesList());
             }
         });
     };
@@ -38,9 +31,7 @@ function HomePage() {
             {profiles.map((profile, index) => (
                 <MiniProfile
                     key={index}
-                    id={profile.id}
-                    firstName={profile.firstName}
-                    lastName={profile.lastName}
+                    profile={profile}
                 />
             ))}
         </div>
