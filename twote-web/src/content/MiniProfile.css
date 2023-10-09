@@ -1,0 +1,19 @@
+.mini-profile {
+    width: 120px;  /* or whatever size you desire */
+    height: 60px;
+    background-color: #ffedcb;  /* choose a background color */
+    border-radius: 15px;  /* adjust for desired roundness */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;  /* optional: for spacing */
+    text-align: center;
+}
+
+.mini-profile a {
+    color: #333;  /* choose a text color */
+    text-decoration: none;
+    font-weight: bold;
+    padding: 10px;
+    display: block;  /* makes the entire area clickable */
+}

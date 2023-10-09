@@ -1,13 +1,16 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import {userProfile} from "../common/UrlUtil";
+import './Profile.css';
 
 const Profile = ({ profile }) => {
     console.log(profile);
     return (
-        <div className="profile">
-            <Link to={userProfile(profile.getUserId())}>{profile.getFirstName()} {profile.getLastName()}</Link>
-        </div>
+        <Link to={userProfile(profile.getUserId())} className="profile-link">
+            <div className="profile">
+                {profile.getFirstName()} {profile.getLastName()}
+            </div>
+        </Link>
     );
 };
 

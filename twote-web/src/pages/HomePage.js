@@ -32,6 +32,7 @@ function HomePage() {
     return (
         <div className="homepage">
             <div className="tweets-column">
+                <h3>Recent Tweets</h3>
                 {tweets.map((tweet, index) => (
                     <Tweet
                         key={index}
@@ -40,6 +41,7 @@ function HomePage() {
                 ))}
             </div>
             <div className="profiles-column">
+                <h3>New Profiles</h3>
                 {profiles.map((profile, index) => (
                     <MiniProfile
                         key={index}

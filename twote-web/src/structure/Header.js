@@ -4,7 +4,7 @@ import Home from "./Home";
 import Logout from "./Logout";
 import ProfileButton from "./ProfileButton";
 import { useLocation } from 'react-router-dom';
-import './Header.css';  // Import the CSS file
+import './Header.css';
 
 function Header() {
     const location = useLocation();

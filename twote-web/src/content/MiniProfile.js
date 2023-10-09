@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {userProfile} from "../common/UrlUtil";
+import './MiniProfile.css';
 
 const MiniProfile = ({ profile }) => {
     return (
-        <div className="mini-profile">
-            <Link to={userProfile(profile.getUserId())}>{profile.getFirstName()} {profile.getLastName()}</Link>
-        </div>
+        <Link to={userProfile(profile.getUserId())} style={{ textDecoration: 'none' }}>
+            <div className="mini-profile">
+                {profile.getFirstName()} {profile.getLastName()}
+            </div>
+        </Link>
     );
 };
 
