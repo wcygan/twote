@@ -8,27 +8,25 @@ import Header from "./structure/Header";
 import CenterColumn from "./structure/CenterColumn";
 import ProfilePage from "./pages/ProfilePage";
 
-
 function App() {
     return (
-        <Background>
-            <CenterColumn>
-                <Header/>
-                <div>
-                    <Router>
+        <Router>
+            <Background>
+                <CenterColumn>
+                    <Header/>
+                    <div>
                         <Routes>
                             <Route path="/" element={<HomePage/>}/>
                             <Route path="/login" element={<LoginComponent/>}/>
                             <Route path="/profile/:id" element={<ProfilePage/>}/>
                             <Route path="/create-account" element={<CreateAccountComponent/>}/>
                         </Routes>
-                    </Router>
-                </div>
-                <Footer/>
-            </CenterColumn>
-        </Background>
+                    </div>
+                    <Footer/>
+                </CenterColumn>
+            </Background>
+        </Router>
     );
 }
-
 
 export default App;
