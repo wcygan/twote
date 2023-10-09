@@ -1,4 +1,4 @@
-import HomePage from './components/HomePage';
+import HomePage from './pages/HomePage';
 import LoginComponent from './components/LoginComponent';
 import CreateAccountComponent from "./components/CreateAccountComponent";
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
