@@ -1,0 +1,20 @@
+/* Tweet.css */
+
+.tweet {
+    border: 1px solid #ccc;  /* Add border */
+    border-radius: 12px;  /* Add rounded corners */
+    padding: 10px;
+    margin: 10px 0;
+    width: 100%;
+    background-color: #e7f1ff;  /* Optional: Add a background color */
+}
+
+.tweet-header, .tweet-body, .tweet-footer {
+    padding: 5px 0;
+    width: 100%;
+}
+
+.user-name, .user-id, .tweet-time {
+    font-size: 14px;
+    margin-right: 10px;  /* Add margin to the right side of the user's name */
+}

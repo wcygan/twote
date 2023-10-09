@@ -23,7 +23,6 @@ const ProfilePage = () => {
             if (err) {
                 console.error(err);
             } else {
-                console.log(response);
                 setProfile(response.getProfile());
                 setTweets(response.getTweetsList());
             }
@@ -31,15 +30,19 @@ const ProfilePage = () => {
     }, []);
 
     return <div>
-        <Profile
-            profile={profile}
-        />
-        {tweets.map((tweet, index) => (
-            <Tweet
-                key={index}
-                tweet={tweet}
+        {profile && <>
+            <Profile
+                profile={profile}
             />
-        ))}
+        </>}
+        <div>
+            {tweets.map((tweet, index) => (
+                <Tweet
+                    key={index}
+                    tweet={tweet}
+                />
+            ))}
+        </div>
     </div>;
 };
 

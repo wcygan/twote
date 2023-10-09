@@ -7,6 +7,7 @@ import Background from "./structure/Background";
 import Header from "./structure/Header";
 import CenterColumn from "./structure/CenterColumn";
 import ProfilePage from "./pages/ProfilePage";
+import './App.css';
 
 function App() {
     return (
@@ -14,7 +15,7 @@ function App() {
             <Background>
                 <CenterColumn>
                     <Header/>
-                    <div>
+                    <div className="Middle-Section">
                         <Routes>
                             <Route path="/" element={<HomePage/>}/>
                             <Route path="/login" element={<LoginComponent/>}/>

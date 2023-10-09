@@ -1,0 +1,17 @@
+/* Header.css */
+.navbar-custom {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-buttons {
+    display: flex;
+    gap: 10px; /* Adjust this value to increase/decrease spacing between buttons */
+    padding-left: 15px;
+}
+
+.right-button {
+    margin-left: auto;
+    padding-right: 15px;
+}
