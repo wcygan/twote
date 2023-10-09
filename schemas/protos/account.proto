@@ -4,24 +4,44 @@ import "google/protobuf/empty.proto";
 
 package account;
 
+// The account service is responsible for creating and authenticating users
 service AccountService {
+  // Login to an existing account
   rpc Login(LoginRequest) returns (LoginResponse);
+
+  // Create a new account
   rpc CreateAccount(CreateAccountRequest) returns (google.protobuf.Empty) {};
 }
 
+// A request to login
 message LoginRequest {
+  // The username of the account
   string username = 1;
+
+  // The password of the account
   string password = 2;
 }
 
+// A response to a login request which contains an authentication token and the user's id
 message LoginResponse {
+  // The authentication token to use for future requests to the backend
   string token = 1;
+
+  // The user's id
   string user_id = 2;
 }
 
+// A request to create an account
 message CreateAccountRequest {
+  // The username of the account
   string username = 1;
+
+  // The password of the account
   string password = 2;
+
+  // The first name of the user
   string first_name = 3;
+
+  // The last name of the user
   string last_name = 4;
 }

@@ -29,11 +29,16 @@ members = [
 
 ## Adding Dependencies
 
-Next, you can add any dependencies to the `Cargo.toml` file. A Rust + gRPC service will likely need, at least, the following dependencies:
+Next, you can add any dependencies to the `Cargo.toml` file and specify the binary name. A Rust + gRPC service will likely need, at least, the following dependencies:
 
 ```toml
+[[bin]]
+name = "accounts-backend"
+path = "src/main.rs"
+
 [dependencies]
 common = { path = "../common" }
+schemas = { path = "../schemas" }
 tokio.workspace=true
 tonic.workspace=true
 tonic-health.workspace=true

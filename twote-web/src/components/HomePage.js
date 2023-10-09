@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { GetRandomProfiles } from '../proto/profile_pb.js';
+import { FindMostRecentProfilesRequest } from '../proto/profile_pb.js';
 import { ProfileServiceClient } from '../proto/profile_grpc_web_pb.js';
 import { authOptions } from '../middleware/AuthInterceptor.js';
 import MiniProfile from '../structure/MiniProfile.js';
@@ -14,9 +14,9 @@ function HomePage() {
     const sendRequest = () => {
         const client = new ProfileServiceClient("http://localhost:8080", null, authOptions);
 
-        const request = new GetRandomProfiles();
+        const request = new FindMostRecentProfilesRequest();
 
-        client.randomProfiles(request, {}, (err, response) => {
+        client.findMostRecentProfiles(request, {}, (err, response) => {
             if (err) {
                 console.error(err);
                 setProfiles([{ firstName: 'Error', lastName: err.message }]);

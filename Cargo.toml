@@ -4,7 +4,8 @@ members = [
     "schemas",
     "twote-api",
     "accounts-backend",
-    "profiles-backend"
+    "profiles-backend",
+    "tweets-backend"
 ]
 resolver = "2"
 

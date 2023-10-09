@@ -1,0 +1,21 @@
+[package]
+name = "tweets-backend"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "tweets-backend"
+path = "src/main.rs"
+
+[dependencies]
+common = { path = "../common" }
+schemas = { path = "../schemas" }
+tokio.workspace=true
+tonic.workspace=true
+tonic-health.workspace=true
+tracing.workspace=true
+tracing-subscriber.workspace=true
+mongodb.workspace=true
+serde.workspace=true
+uuid.workspace=true
+prost-types.workspace=true

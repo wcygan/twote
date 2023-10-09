@@ -4,6 +4,7 @@ pub enum Service {
     TwoteApi,
     AccountsBackend,
     ProfilesBackend,
+    TweetsBackend,
 }
 
 impl Service {
@@ -12,6 +13,7 @@ impl Service {
             Service::TwoteApi => 8081,
             Service::AccountsBackend => 8082,
             Service::ProfilesBackend => 8083,
+            Service::TweetsBackend => 8084,
         }
     }
 
@@ -20,6 +22,7 @@ impl Service {
             Service::TwoteApi => "twote-api",
             Service::AccountsBackend => "accounts-backend",
             Service::ProfilesBackend => "profiles-backend",
+            Service::TweetsBackend => "tweets-backend",
         }
     }
 

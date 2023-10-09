@@ -16,6 +16,8 @@ use schemas::account::{LoginRequest, LoginResponse};
 use schemas::profile::profile_service_client::ProfileServiceClient;
 use schemas::profile::CreateProfileRequest;
 
+const SIXTY_MINUTES_IN_SECONDS: usize = 60 * 60;
+
 #[derive(Debug, Validate)]
 struct LoginData {
     #[validate(length(min = 4))]
@@ -158,7 +160,11 @@ impl AccountServiceImpl {
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
 
-        con.set(key, value)
+        con.set(key.clone(), value)
+            .await
+            .map_err(|e| Status::new(Code::Internal, e.to_string()))?;
+
+        con.expire(key, SIXTY_MINUTES_IN_SECONDS)
             .await
             .map_err(|e| Status::new(Code::Internal, e.to_string()))
     }

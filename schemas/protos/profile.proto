@@ -5,37 +5,68 @@ import "google/protobuf/empty.proto";
 
 package profile;
 
+// The profile service is responsible for managing user profiles.
 service ProfileService {
+  // Create a new profile.
   rpc Create(CreateProfileRequest) returns (google.protobuf.Empty) {};
+
+  // Get a profile by user ID.
   rpc Get(GetProfileRequest) returns (Profile) {};
-  rpc BatchGet(BatchGetProfileRequest) returns (BatchGetProfileResponse) {};
-  rpc RandomProfiles(GetRandomProfiles) returns (BatchGetProfileResponse) {};
+
+  // Get multiple profiles by user ID.
+  rpc BatchGet(BatchGetProfileRequest) returns (BatchProfileResponse) {};
+
+  // Find the most recently created profiles.
+  rpc FindMostRecentProfiles(FindMostRecentProfilesRequest) returns (BatchProfileResponse) {};
 }
 
+// A user profile.
 message Profile {
+  // The user ID.
   string user_id = 1;
+
+  // The user's first name.
   string first_name = 2;
+
+  // The user's last name.
   string last_name = 3;
+
+  // The user's biography.
   string biography = 4;
+
+  // The date the user joined.
   google.protobuf.Timestamp joined_at = 5;
 }
 
+// Request to create a profile.
 message CreateProfileRequest {
+  // The user ID.
   string user_id = 1;
+
+  // The user's first name.
   string first_name = 2;
+
+  // The user's last name.
   string last_name = 3;
 }
 
+// Request to get a profile.
 message GetProfileRequest {
+  // The user ID.
   string user_id = 1;
 }
 
+// Request to get multiple profiles.
 message BatchGetProfileRequest {
+  // The user IDs to get.
   repeated string user_ids = 1;
 }
 
-message BatchGetProfileResponse {
+// Response to get multiple profiles.
+message BatchProfileResponse {
+  // The profiles.
   repeated Profile profiles = 1;
 }
 
-message GetRandomProfiles {}
+// Request to find the most recently created profiles.
+message FindMostRecentProfilesRequest {}
