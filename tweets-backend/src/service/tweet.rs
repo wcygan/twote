@@ -88,15 +88,14 @@ impl TweetService for TweetServiceImpl {
             match result {
                 Ok(document) => match bson::from_document::<TweetsDao>(document) {
                     Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize tweet")),
+                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
                 },
-                Err(_) => return Err(Status::internal("Failed to get tweet")),
+                Err(_) => return Err(Status::internal("Failed to batch get tweets")),
             }
         }
 
         // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
-
     }
 
     #[tracing::instrument(skip(self))]
@@ -110,7 +109,7 @@ impl TweetService for TweetServiceImpl {
             .collection(MongoCollection::Tweets.name())
             .find(None, None)
             .await
-            .map_err(|_| Status::internal("Failed to get tweets"))?;
+            .map_err(|_| Status::internal("Failed to get all tweets"))?;
 
         // Collect the resulting tweets into a vector/list
         let mut tweets = Vec::new();
@@ -118,9 +117,9 @@ impl TweetService for TweetServiceImpl {
             match result {
                 Ok(document) => match bson::from_document::<TweetsDao>(document) {
                     Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
+                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
                 },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
+                Err(_) => return Err(Status::internal("Failed to get all tweets")),
             }
         }
 
@@ -133,9 +132,37 @@ impl TweetService for TweetServiceImpl {
         &self,
         _request: Request<FindMostRecentTweetsByUserRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        unimplemented!()
+        info!("Find Most Recent Tweets By User");
+
+        let user_id = _request.into_inner().user_id;
+        let mut cursor = self.client
+            .database(MongoDB::Tweets.name())
+            .collection(MongoCollection::Tweets.name())
+            .find(
+                doc! {
+                    "user_id": user_id,
+                },
+                None,
+            )
+            .await
+            .map_err(|_| Status::internal("Failed to get all tweets by user"))?;
+
+        // Collect the resulting tweets into a vector/list
+        let mut tweets = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => match bson::from_document::<TweetsDao>(document) {
+                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
+                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
+                },
+                Err(_) => return Err(Status::internal("Failed to get all tweets by user ")),
+            }
+        }
+
+        // Build and return the response
+        Ok(Response::new(BatchTweetResponse { tweets }))
+        }
     }
-}
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct TweetsDao {
