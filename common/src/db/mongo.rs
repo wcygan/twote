@@ -46,7 +46,7 @@ impl MongoCollection {
 /// # Returns
 ///     
 /// A vector of items
-pub async fn collect<T: DeserializeOwned>(
+pub async fn collect_deserialize<T: DeserializeOwned>(
     mut cursor: Cursor<Document>,
     limit: Option<usize>,
 ) -> Result<Vec<T>, tonic::Status> {

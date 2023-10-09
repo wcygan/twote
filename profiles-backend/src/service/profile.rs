@@ -1,8 +1,7 @@
-use common::db::mongo::{collect, MongoCollection, MongoDB};
+use common::db::mongo::{collect_deserialize, MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
 use std::time::Instant;
-use tonic::codegen::tokio_stream::StreamExt;
 use tonic::{Request, Response, Status};
 use tracing::info;
 
@@ -68,7 +67,7 @@ impl ProfileService for ProfileServiceImpl {
 
         // Get the profiles from the database
         let user_ids = _request.into_inner().user_ids;
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -83,13 +82,12 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        let profiles = collect::<ProfileDao>(cursor, None)
+        let profiles = collect_deserialize::<ProfileDao>(cursor, None)
             .await?
             .into_iter()
             .map(|tweet_dao| tweet_dao.into())
             .collect::<Vec<Profile>>();
 
-        // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))
     }
 
@@ -98,7 +96,7 @@ impl ProfileService for ProfileServiceImpl {
         &self,
         _request: Request<FindMostRecentProfilesRequest>,
     ) -> Result<Response<BatchProfileResponse>, Status> {
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -106,13 +104,12 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        let profiles = collect::<ProfileDao>(cursor, None)
+        let profiles = collect_deserialize::<ProfileDao>(cursor, None)
             .await?
             .into_iter()
             .map(|tweet_dao| tweet_dao.into())
             .collect::<Vec<Profile>>();
 
-        // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))
     }
 }
@@ -132,31 +129,31 @@ struct ProfileDao {
     joined_at: bson::Timestamp,
 }
 
-impl Into<Profile> for ProfileDao {
-    fn into(self) -> Profile {
+impl From<ProfileDao> for Profile {
+    fn from(val: ProfileDao) -> Self {
         let ts = prost_types::Timestamp {
-            seconds: self.joined_at.time as i64,
+            seconds: val.joined_at.time as i64,
             nanos: 0,
         };
 
         Profile {
-            user_id: self._id,
-            first_name: self.first_name,
-            last_name: self.last_name,
-            biography: self.bio,
+            user_id: val._id,
+            first_name: val.first_name,
+            last_name: val.last_name,
+            biography: val.bio,
             joined_at: Some(ts),
         }
     }
 }
 
-impl Into<bson::Document> for ProfileDao {
-    fn into(self) -> bson::Document {
+impl From<ProfileDao> for bson::Document {
+    fn from(val: ProfileDao) -> Self {
         doc! {
-            "_id": &self._id,
-            "first_name": &self.first_name,
-            "last_name": &self.last_name,
-            "bio": &self.bio,
-            "joined_at": &self.joined_at,
+            "_id": &val._id,
+            "first_name": &val.first_name,
+            "last_name": &val.last_name,
+            "bio": &val.bio,
+            "joined_at": &val.joined_at,
         }
     }
 }

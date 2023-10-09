@@ -6,7 +6,7 @@ use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 
-use common::db::mongo::{collect, MongoCollection, MongoDB};
+use common::db::mongo::{collect_deserialize, MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
     BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
@@ -81,7 +81,7 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to batch get tweets"))?;
 
-        let tweets = collect::<TweetsDao>(cursor, None)
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
             .await?
             .into_iter()
             .map(|tweet_dao| tweet_dao.into())
@@ -103,7 +103,7 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get tweets"))?;
 
-        let tweets = collect::<TweetsDao>(cursor, None)
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
             .await?
             .into_iter()
             .map(|tweet_dao| tweet_dao.into())
@@ -129,29 +129,29 @@ struct TweetsDao {
     created_at: bson::Timestamp,
 }
 
-impl Into<Tweet> for TweetsDao {
-    fn into(self) -> Tweet {
+impl From<TweetsDao> for Tweet {
+    fn from(val: TweetsDao) -> Self {
         let ts = prost_types::Timestamp {
-            seconds: self.created_at.time as i64,
+            seconds: val.created_at.time as i64,
             nanos: 0,
         };
 
         Tweet {
-            tweet_id: self._id,
-            user_id: self.user_id,
-            message: self.message,
+            tweet_id: val._id,
+            user_id: val.user_id,
+            message: val.message,
             created_at: Some(ts),
         }
     }
 }
 
-impl Into<bson::Document> for TweetsDao {
-    fn into(self) -> bson::Document {
+impl From<TweetsDao> for bson::Document {
+    fn from(val: TweetsDao) -> Self {
         doc! {
-            "_id": &self._id,
-            "user_id": &self.user_id,
-            "message": &self.message,
-            "created_at": &self.created_at,
+            "_id": &val._id,
+            "user_id": &val.user_id,
+            "message": &val.message,
+            "created_at": &val.created_at,
         }
     }
 }
