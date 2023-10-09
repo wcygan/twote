@@ -2,12 +2,12 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
-use tonic::{Request, Response, Status};
 use tonic::codegen::tokio_stream::StreamExt;
+use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 
-use common::{MongoCollection, MongoDB};
+use common::db::mongo::{MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
     BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
@@ -68,7 +68,8 @@ impl TweetService for TweetServiceImpl {
         info!("Batch-get Tweets");
 
         let tweet_id = _request.into_inner().tweet_ids;
-        let mut cursor = self.client
+        let mut cursor = self
+            .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
             .find(
@@ -96,7 +97,6 @@ impl TweetService for TweetServiceImpl {
 
         // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
-
     }
 
     #[tracing::instrument(skip(self))]

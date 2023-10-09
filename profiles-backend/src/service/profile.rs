@@ -1,4 +1,4 @@
-use common::{MongoCollection, MongoDB};
+use common::db::mongo::{MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
 use std::time::Instant;

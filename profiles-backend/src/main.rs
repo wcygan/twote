@@ -1,10 +1,11 @@
-use common::MongoDB;
 use tonic::transport::Server;
 use tracing::info;
 
-use crate::service::profile::ProfileServiceImpl;
+use common::db::mongo::MongoDB;
 use common::Service::ProfilesBackend;
 use schemas::profile::profile_service_server::ProfileServiceServer;
+
+use crate::service::profile::ProfileServiceImpl;
 
 mod service;
 
