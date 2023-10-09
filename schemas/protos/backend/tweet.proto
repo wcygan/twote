@@ -36,6 +36,9 @@ message Tweet {
 
   // The time the tweet was created.
   google.protobuf.Timestamp created_at = 4;
+
+  // The ID of the tweet who this tweet is replying to.
+  string parent_tweet_id = 5;
 }
 
 // A response containing a batch of tweets.

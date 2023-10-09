@@ -152,6 +152,7 @@ struct TweetsDao {
     user_id: String,
     message: String,
     created_at: bson::Timestamp,
+    parent_tweet_id: Option<String>,
 }
 
 impl From<TweetsDao> for Tweet {
@@ -166,6 +167,7 @@ impl From<TweetsDao> for Tweet {
             user_id: val.user_id,
             message: val.message,
             created_at: Some(ts),
+            parent_tweet_id: val.parent_tweet_id.unwrap_or("".to_string()),
         }
     }
 }
@@ -177,6 +179,7 @@ impl From<TweetsDao> for bson::Document {
             "user_id": &val.user_id,
             "message": &val.message,
             "created_at": &val.created_at,
+            "parent_tweet_id": &val.parent_tweet_id,
         }
     }
 }
@@ -193,6 +196,7 @@ impl TweetsDao {
             user_id: request.user_id,
             message: request.message,
             created_at,
+            parent_tweet_id: None,
         }
     }
 }
