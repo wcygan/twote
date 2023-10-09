@@ -1,8 +1,7 @@
-use common::{MongoCollection, MongoDB};
+use common::db::mongo::{collect_deserialize, MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
 use std::time::Instant;
-use tonic::codegen::tokio_stream::StreamExt;
 use tonic::{Request, Response, Status};
 use tracing::info;
 
@@ -23,11 +22,11 @@ impl ProfileService for ProfileServiceImpl {
         info!("Creating Profile");
 
         // Insert the profile into the database
-        let bson_data: bson::Document = ProfileDao::create_from(request.into_inner()).into();
+        let profile: bson::Document = ProfileDao::create_from(request.into_inner()).into();
         self.client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
-            .insert_one(bson_data, None)
+            .insert_one(profile, None)
             .await
             .map_err(|_| Status::internal("Failed to create profile"))?;
 
@@ -39,7 +38,7 @@ impl ProfileService for ProfileServiceImpl {
         info!("Getting Profile");
 
         // Get the profile from the database
-        let profile = self
+        let document = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -50,20 +49,13 @@ impl ProfileService for ProfileServiceImpl {
                 None,
             )
             .await
-            .map_err(|_| Status::internal("Failed to get profile"))?;
+            .map_err(|_| Status::internal("Failed to get profile"))?
+            .ok_or(Status::not_found("Profile not found"))?;
 
-        // Build and return the response
-        match profile {
-            Some(profile) => {
-                info!("Found profile: {:?}", profile);
-                let profile_dao = bson::from_document::<ProfileDao>(profile).map_err(|e| {
-                    info!("Failed to deserialize profile: {:?}", e);
-                    Status::internal("Failed to get profile")
-                })?;
-                Ok(Response::new(profile_dao.into()))
-            }
-            None => Err(Status::not_found("Profile not found")),
-        }
+        let profile: ProfileDao = bson::from_document(document)
+            .map_err(|_| Status::internal("Failed to parse profile"))?;
+
+        Ok(Response::new(profile.into()))
     }
 
     #[tracing::instrument(skip(self))]
@@ -75,7 +67,7 @@ impl ProfileService for ProfileServiceImpl {
 
         // Get the profiles from the database
         let user_ids = _request.into_inner().user_ids;
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -90,19 +82,12 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        // Collect the resulting profiles into a vector
-        let mut profiles = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
-            }
-        }
+        let profiles = collect_deserialize::<ProfileDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Profile>>();
 
-        // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))
     }
 
@@ -111,7 +96,7 @@ impl ProfileService for ProfileServiceImpl {
         &self,
         _request: Request<FindMostRecentProfilesRequest>,
     ) -> Result<Response<BatchProfileResponse>, Status> {
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -119,19 +104,12 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        // Collect the resulting profiles into a vector
-        let mut profiles = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
-            }
-        }
+        let profiles = collect_deserialize::<ProfileDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Profile>>();
 
-        // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))
     }
 }
@@ -151,31 +129,31 @@ struct ProfileDao {
     joined_at: bson::Timestamp,
 }
 
-impl Into<Profile> for ProfileDao {
-    fn into(self) -> Profile {
+impl From<ProfileDao> for Profile {
+    fn from(val: ProfileDao) -> Self {
         let ts = prost_types::Timestamp {
-            seconds: self.joined_at.time as i64,
+            seconds: val.joined_at.time as i64,
             nanos: 0,
         };
 
         Profile {
-            user_id: self._id,
-            first_name: self.first_name,
-            last_name: self.last_name,
-            biography: self.bio,
+            user_id: val._id,
+            first_name: val.first_name,
+            last_name: val.last_name,
+            biography: val.bio,
             joined_at: Some(ts),
         }
     }
 }
 
-impl Into<bson::Document> for ProfileDao {
-    fn into(self) -> bson::Document {
+impl From<ProfileDao> for bson::Document {
+    fn from(val: ProfileDao) -> Self {
         doc! {
-            "_id": &self._id,
-            "first_name": &self.first_name,
-            "last_name": &self.last_name,
-            "bio": &self.bio,
-            "joined_at": &self.joined_at,
+            "_id": &val._id,
+            "first_name": &val.first_name,
+            "last_name": &val.last_name,
+            "bio": &val.bio,
+            "joined_at": &val.joined_at,
         }
     }
 }

@@ -8,6 +8,8 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
+serde.workspace=true
+anyhow.workspace=true
 futures.workspace=true
 hyper.workspace=true
 tokio.workspace=true
@@ -15,3 +17,4 @@ tower.workspace=true
 tonic.workspace=true
 tracing.workspace=true
 redis.workspace=true
+mongodb.workspace=true

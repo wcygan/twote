@@ -1,7 +1,7 @@
 use tonic::transport::Server;
 use tracing::info;
 
-use common::middleware::authentication::AuthMiddleware;
+use common::authentication::AuthMiddleware;
 use common::Service::TwoteApi;
 use schemas::account::account_service_server::AccountServiceServer;
 use schemas::profile::profile_service_server::ProfileServiceServer;

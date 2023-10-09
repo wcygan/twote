@@ -2,12 +2,11 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
-use tonic::codegen::tokio_stream::StreamExt;
 use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 
-use common::{MongoCollection, MongoDB};
+use common::db::mongo::{collect_deserialize, MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
     BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
@@ -45,18 +44,17 @@ impl TweetService for TweetServiceImpl {
     async fn get(&self, request: Request<GetTweetRequest>) -> Result<Response<Tweet>, Status> {
         info!("Getting Tweet");
 
-        let tweet_id = request.into_inner().tweet_id;
-        let bson_data = self
+        let document = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
-            .find_one(doc! { "_id": tweet_id }, None)
+            .find_one(doc! { "_id": request.into_inner().tweet_id }, None)
             .await
             .map_err(|_| Status::internal("Failed to get tweet"))?
             .ok_or(Status::not_found("Tweet not found"))?;
 
-        let tweet: TweetsDao = bson::from_document(bson_data)
-            .map_err(|_| Status::internal("Failed to parse tweet"))?;
+        let tweet: TweetsDao =
+            bson::from_document(document).map_err(|_| Status::internal("Failed to parse tweet"))?;
 
         Ok(Response::new(tweet.into()))
     }
@@ -68,7 +66,7 @@ impl TweetService for TweetServiceImpl {
         info!("Batch-get Tweets");
 
         let tweet_id = _request.into_inner().tweet_ids;
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
@@ -83,19 +81,12 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to batch get tweets"))?;
 
-        // Collect the resulting tweets into a vector/list
-        let mut tweets = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<TweetsDao>(document) {
-                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
-                },
-                Err(_) => return Err(Status::internal("Failed to batch get tweets")),
-            }
-        }
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
 
-        // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
     }
 
@@ -104,7 +95,9 @@ impl TweetService for TweetServiceImpl {
         &self,
         _request: Request<FindMostRecentTweetsRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        let mut cursor = self
+        info!("Find Most Recent Tweets");
+
+        let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
@@ -112,19 +105,12 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get all tweets"))?;
 
-        // Collect the resulting tweets into a vector/list
-        let mut tweets = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<TweetsDao>(document) {
-                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get all tweets")),
-            }
-        }
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
 
-        // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
     }
 
@@ -136,7 +122,7 @@ impl TweetService for TweetServiceImpl {
         info!("Find Most Recent Tweets By User");
 
         let user_id = _request.into_inner().user_id;
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
@@ -149,17 +135,11 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get all tweets by user"))?;
 
-        // Collect the resulting tweets into a vector/list
-        let mut tweets = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<TweetsDao>(document) {
-                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize tweets")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get all tweets by user ")),
-            }
-        }
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
 
         // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
@@ -174,29 +154,29 @@ struct TweetsDao {
     created_at: bson::Timestamp,
 }
 
-impl Into<Tweet> for TweetsDao {
-    fn into(self) -> Tweet {
+impl From<TweetsDao> for Tweet {
+    fn from(val: TweetsDao) -> Self {
         let ts = prost_types::Timestamp {
-            seconds: self.created_at.time as i64,
+            seconds: val.created_at.time as i64,
             nanos: 0,
         };
 
         Tweet {
-            tweet_id: self._id,
-            user_id: self.user_id,
-            message: self.message,
+            tweet_id: val._id,
+            user_id: val.user_id,
+            message: val.message,
             created_at: Some(ts),
         }
     }
 }
 
-impl Into<bson::Document> for TweetsDao {
-    fn into(self) -> bson::Document {
+impl From<TweetsDao> for bson::Document {
+    fn from(val: TweetsDao) -> Self {
         doc! {
-            "_id": &self._id,
-            "user_id": &self.user_id,
-            "message": &self.message,
-            "created_at": &self.created_at,
+            "_id": &val._id,
+            "user_id": &val.user_id,
+            "message": &val.message,
+            "created_at": &val.created_at,
         }
     }
 }
