@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
+use mongodb::options::FindOptions;
 use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
@@ -76,7 +77,9 @@ impl TweetService for TweetServiceImpl {
                         "$in": tweet_id,
                     },
                 },
-                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
             )
             .await
             .map_err(|_| Status::internal("Failed to batch get tweets"))?;
@@ -101,7 +104,12 @@ impl TweetService for TweetServiceImpl {
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
-            .find(None, None)
+            .find(
+                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
+            )
             .await
             .map_err(|_| Status::internal("Failed to get all tweets"))?;
 
@@ -130,7 +138,9 @@ impl TweetService for TweetServiceImpl {
                 doc! {
                     "user_id": user_id,
                 },
-                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
             )
             .await
             .map_err(|_| Status::internal("Failed to get all tweets by user"))?;
