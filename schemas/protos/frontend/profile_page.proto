@@ -5,7 +5,7 @@ import "frontend/tweet.proto";
 
 package frontend;
 
-service ProfileService {
+service ProfilePageService {
   // Gets a user's profile page.
   rpc GetProfilePage(GetProfilePageRequest) returns (ProfilePage);
 }

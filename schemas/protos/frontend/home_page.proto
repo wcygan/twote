@@ -10,7 +10,7 @@ package frontend;
 // The homepage service is responsible for loading the homepage.
 service HomePageService {
   // Load the homepage.
-  rpc LoadHomePage(google.protobuf.Empty) returns (HomePage);
+  rpc GetHomePage(google.protobuf.Empty) returns (HomePage);
 }
 
 // The homepage message contains the tweets and profiles to display on the homepage.

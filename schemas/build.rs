@@ -12,6 +12,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     tonic_build::configure()
         .build_server(true)
+        .build_client(true)
         .compile(&proto_files, &["protos/"])?;
 
     Ok(())

@@ -11,3 +11,7 @@ pub mod profile {
 pub mod tweet {
     include!(concat!(env!("OUT_DIR"), "/tweet.rs"));
 }
+
+pub mod frontend {
+    include!(concat!(env!("OUT_DIR"), "/frontend.rs"));
+}
