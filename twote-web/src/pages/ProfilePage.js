@@ -3,6 +3,7 @@ import {GetProfileRequest} from '../proto/backend/profile_pb.js';
 import {authOptions} from "../middleware/AuthInterceptor";
 import React, {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom';
+import {date_from_seconds} from "../common/DateUtil";
 
 const ProfilePage = () => {
     const [userId, setUserId] = useState('');
@@ -26,12 +27,12 @@ const ProfilePage = () => {
                 return;
             }
 
-            const date = new Date(response.getJoinedAt().getSeconds() * 1000);
+            const date = date_from_seconds(response.getJoinedAt().getSeconds());
             setUserId(response.getUserId());
             setFirstName(response.getFirstName());
             setLastName(response.getLastName());
             setBio(response.getBiography());
-            setJoinedAt(date.toDateString());
+            setJoinedAt(date);
         });
     }, []);
 

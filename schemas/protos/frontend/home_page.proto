@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "backend/profile.proto";
 import "frontend/tweet.proto";

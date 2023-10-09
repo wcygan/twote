@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {userProfile} from "../common/UrlHelper";
+import {userProfile} from "../common/UrlUtil";
 
 const MiniProfile = ({ id, firstName, lastName }) => {
     return (
