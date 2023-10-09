@@ -1,4 +1,4 @@
-use common::db::mongo::{MongoCollection, MongoDB};
+use common::db::mongo::{collect, MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
 use std::time::Instant;
@@ -39,7 +39,7 @@ impl ProfileService for ProfileServiceImpl {
         info!("Getting Profile");
 
         // Get the profile from the database
-        let profile = self
+        let document = self
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
@@ -50,20 +50,13 @@ impl ProfileService for ProfileServiceImpl {
                 None,
             )
             .await
-            .map_err(|_| Status::internal("Failed to get profile"))?;
+            .map_err(|_| Status::internal("Failed to get profile"))?
+            .ok_or(Status::not_found("Profile not found"))?;
 
-        // Build and return the response
-        match profile {
-            Some(profile) => {
-                info!("Found profile: {:?}", profile);
-                let profile_dao = bson::from_document::<ProfileDao>(profile).map_err(|e| {
-                    info!("Failed to deserialize profile: {:?}", e);
-                    Status::internal("Failed to get profile")
-                })?;
-                Ok(Response::new(profile_dao.into()))
-            }
-            None => Err(Status::not_found("Profile not found")),
-        }
+        let profile: ProfileDao = bson::from_document(document)
+            .map_err(|_| Status::internal("Failed to parse profile"))?;
+
+        Ok(Response::new(profile.into()))
     }
 
     #[tracing::instrument(skip(self))]
@@ -90,17 +83,11 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        // Collect the resulting profiles into a vector
-        let mut profiles = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
-            }
-        }
+        let profiles = collect::<ProfileDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Profile>>();
 
         // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))
@@ -119,17 +106,11 @@ impl ProfileService for ProfileServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 
-        // Collect the resulting profiles into a vector
-        let mut profiles = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<ProfileDao>(document) {
-                    Ok(profile_dao) => profiles.push(profile_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
-            }
-        }
+        let profiles = collect::<ProfileDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Profile>>();
 
         // Build and return the response
         Ok(Response::new(BatchProfileResponse { profiles }))

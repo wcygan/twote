@@ -1,3 +1,9 @@
+use anyhow::Result;
+use futures::StreamExt;
+use mongodb::bson::Document;
+use mongodb::{bson, Cursor};
+use serde::de::DeserializeOwned;
+
 pub enum MongoDB {
     Profiles,
     Tweets,
@@ -28,4 +34,40 @@ impl MongoCollection {
             Self::Tweets => "tweets",
         }
     }
+}
+
+/// A helper function to collect items from a MongoDB cursor
+///
+/// # Arguments
+///
+/// * `cursor` - The MongoDB cursor
+/// * `limit` - The maximum number of items to collect
+///
+/// # Returns
+///     
+/// A vector of items
+pub async fn collect<T: DeserializeOwned>(
+    mut cursor: Cursor<Document>,
+    limit: Option<usize>,
+) -> Result<Vec<T>, tonic::Status> {
+    let mut items = Vec::new();
+    while let Some(result) = cursor.next().await {
+        // Check if we've reached the limit
+        if let Some(limit) = limit {
+            if items.len() >= limit {
+                break;
+            }
+        }
+
+        // Deserialize the document
+        match result {
+            Ok(document) => match bson::from_document::<T>(document) {
+                Ok(item) => items.push(item),
+                Err(_) => return Err(tonic::Status::internal("Failed to deserialize item")),
+            },
+            Err(_) => return Err(tonic::Status::internal("Failed to get item")),
+        }
+    }
+
+    Ok(items)
 }

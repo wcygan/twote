@@ -2,12 +2,11 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
-use tonic::codegen::tokio_stream::StreamExt;
 use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
 
-use common::db::mongo::{MongoCollection, MongoDB};
+use common::db::mongo::{collect, MongoCollection, MongoDB};
 use schemas::tweet::tweet_service_server::TweetService;
 use schemas::tweet::{
     BatchTweetRequest, BatchTweetResponse, CreateTweetRequest, FindMostRecentTweetsByUserRequest,
@@ -45,18 +44,17 @@ impl TweetService for TweetServiceImpl {
     async fn get(&self, request: Request<GetTweetRequest>) -> Result<Response<Tweet>, Status> {
         info!("Getting Tweet");
 
-        let tweet_id = request.into_inner().tweet_id;
-        let bson_data = self
+        let document = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
-            .find_one(doc! { "_id": tweet_id }, None)
+            .find_one(doc! { "_id": request.into_inner().tweet_id }, None)
             .await
             .map_err(|_| Status::internal("Failed to get tweet"))?
             .ok_or(Status::not_found("Tweet not found"))?;
 
-        let tweet: TweetsDao = bson::from_document(bson_data)
-            .map_err(|_| Status::internal("Failed to parse tweet"))?;
+        let tweet: TweetsDao =
+            bson::from_document(document).map_err(|_| Status::internal("Failed to parse tweet"))?;
 
         Ok(Response::new(tweet.into()))
     }
@@ -68,7 +66,7 @@ impl TweetService for TweetServiceImpl {
         info!("Batch-get Tweets");
 
         let tweet_id = _request.into_inner().tweet_ids;
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
@@ -83,19 +81,12 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to batch get tweets"))?;
 
-        // Collect the resulting tweets into a vector/list
-        let mut tweets = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<TweetsDao>(document) {
-                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize tweet")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get tweet")),
-            }
-        }
+        let tweets = collect::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
 
-        // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
     }
 
@@ -104,7 +95,7 @@ impl TweetService for TweetServiceImpl {
         &self,
         _request: Request<FindMostRecentTweetsRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        let mut cursor = self
+        let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
@@ -112,19 +103,12 @@ impl TweetService for TweetServiceImpl {
             .await
             .map_err(|_| Status::internal("Failed to get tweets"))?;
 
-        // Collect the resulting tweets into a vector/list
-        let mut tweets = Vec::new();
-        while let Some(result) = cursor.next().await {
-            match result {
-                Ok(document) => match bson::from_document::<TweetsDao>(document) {
-                    Ok(tweet_dao) => tweets.push(tweet_dao.into()),
-                    Err(_) => return Err(Status::internal("Failed to deserialize profile")),
-                },
-                Err(_) => return Err(Status::internal("Failed to get profile")),
-            }
-        }
+        let tweets = collect::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
 
-        // Build and return the response
         Ok(Response::new(BatchTweetResponse { tweets }))
     }
 
