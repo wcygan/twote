@@ -95,13 +95,15 @@ impl TweetService for TweetServiceImpl {
         &self,
         _request: Request<FindMostRecentTweetsRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
+        info!("Find Most Recent Tweets");
+
         let cursor = self
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
             .find(None, None)
             .await
-            .map_err(|_| Status::internal("Failed to get tweets"))?;
+            .map_err(|_| Status::internal("Failed to get all tweets"))?;
 
         let tweets = collect_deserialize::<TweetsDao>(cursor, None)
             .await?
@@ -117,7 +119,30 @@ impl TweetService for TweetServiceImpl {
         &self,
         _request: Request<FindMostRecentTweetsByUserRequest>,
     ) -> Result<Response<BatchTweetResponse>, Status> {
-        unimplemented!()
+        info!("Find Most Recent Tweets By User");
+
+        let user_id = _request.into_inner().user_id;
+        let cursor = self
+            .client
+            .database(MongoDB::Tweets.name())
+            .collection(MongoCollection::Tweets.name())
+            .find(
+                doc! {
+                    "user_id": user_id,
+                },
+                None,
+            )
+            .await
+            .map_err(|_| Status::internal("Failed to get all tweets by user"))?;
+
+        let tweets = collect_deserialize::<TweetsDao>(cursor, None)
+            .await?
+            .into_iter()
+            .map(|tweet_dao| tweet_dao.into())
+            .collect::<Vec<Tweet>>();
+
+        // Build and return the response
+        Ok(Response::new(BatchTweetResponse { tweets }))
     }
 }
 

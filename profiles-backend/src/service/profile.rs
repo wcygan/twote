@@ -22,11 +22,11 @@ impl ProfileService for ProfileServiceImpl {
         info!("Creating Profile");
 
         // Insert the profile into the database
-        let bson_data: bson::Document = ProfileDao::create_from(request.into_inner()).into();
+        let profile: bson::Document = ProfileDao::create_from(request.into_inner()).into();
         self.client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
-            .insert_one(bson_data, None)
+            .insert_one(profile, None)
             .await
             .map_err(|_| Status::internal("Failed to create profile"))?;
 
