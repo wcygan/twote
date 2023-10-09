@@ -1,6 +1,7 @@
 use tokio::task::JoinHandle;
 
 pub mod db;
+pub mod helpers;
 mod service;
 
 pub use service::Service;

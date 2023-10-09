@@ -358,6 +358,7 @@ dependencies = [
  "hyper",
  "mongodb",
  "redis",
+ "schemas",
  "serde",
  "tokio",
  "tonic",
