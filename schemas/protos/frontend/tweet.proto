@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package frontend;
+
+message Tweet {
+  // The ID of the tweet.
+  string tweet_id = 1;
+
+  // The ID of the user who posted the tweet.
+  string user_id = 2;
+
+  // The ID of the user who posted the tweet.
+  string first_name = 3;
+
+  // The ID of the user who posted the tweet.
+  string last_name = 4;
+
+  // The message of the tweet.
+  string message = 5;
+
+  // The time the tweet was created.
+  google.protobuf.Timestamp created_at = 6;
+
+  // The ID of the tweet who this tweet is replying to.
+  string parent_tweet_id = 7;
+}

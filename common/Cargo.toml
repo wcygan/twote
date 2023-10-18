@@ -8,6 +8,7 @@ license = "MIT"
 path = "src/lib.rs"
 
 [dependencies]
+schemas = { path = "../schemas" }
 serde.workspace=true
 anyhow.workspace=true
 futures.workspace=true

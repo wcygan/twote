@@ -14,4 +14,4 @@ You will need [grpcurl](https://github.com/fullstorydev/grpcurl) installed.
 
 Next, find example requests in the [grpcurl-examples](../grpcurl-examples) folder.
 
-For example, [profile.md](../grpcurl-examples/profile.md) contains examples for [profile.proto](../schemas/protos/profile.proto).
+For example, [profile.md](../grpcurl-examples/profile.md) contains examples for [profile.proto](../schemas/protos/backend/profile.proto).

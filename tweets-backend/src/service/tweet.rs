@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use mongodb::bson;
 use mongodb::bson::doc;
+use mongodb::options::FindOptions;
 use tonic::{Request, Response, Status};
 use tracing::info;
 use uuid::Uuid;
@@ -76,7 +77,9 @@ impl TweetService for TweetServiceImpl {
                         "$in": tweet_id,
                     },
                 },
-                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
             )
             .await
             .map_err(|_| Status::internal("Failed to batch get tweets"))?;
@@ -101,7 +104,12 @@ impl TweetService for TweetServiceImpl {
             .client
             .database(MongoDB::Tweets.name())
             .collection(MongoCollection::Tweets.name())
-            .find(None, None)
+            .find(
+                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
+            )
             .await
             .map_err(|_| Status::internal("Failed to get all tweets"))?;
 
@@ -130,7 +138,9 @@ impl TweetService for TweetServiceImpl {
                 doc! {
                     "user_id": user_id,
                 },
-                None,
+                FindOptions::builder()
+                    .sort(doc! { "created_at": -1 })
+                    .build(),
             )
             .await
             .map_err(|_| Status::internal("Failed to get all tweets by user"))?;
@@ -152,6 +162,7 @@ struct TweetsDao {
     user_id: String,
     message: String,
     created_at: bson::Timestamp,
+    parent_tweet_id: Option<String>,
 }
 
 impl From<TweetsDao> for Tweet {
@@ -166,6 +177,7 @@ impl From<TweetsDao> for Tweet {
             user_id: val.user_id,
             message: val.message,
             created_at: Some(ts),
+            parent_tweet_id: val.parent_tweet_id.unwrap_or("".to_string()),
         }
     }
 }
@@ -177,6 +189,7 @@ impl From<TweetsDao> for bson::Document {
             "user_id": &val.user_id,
             "message": &val.message,
             "created_at": &val.created_at,
+            "parent_tweet_id": &val.parent_tweet_id,
         }
     }
 }
@@ -193,6 +206,7 @@ impl TweetsDao {
             user_id: request.user_id,
             message: request.message,
             created_at,
+            parent_tweet_id: None,
         }
     }
 }

@@ -1,0 +1,16 @@
+.homepage {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.tweets-column {
+    flex: 8;
+    padding: 10px;
+    border-right: 1px solid #ccc;  /* Optional: for visual separation */
+}
+
+.profiles-column {
+    flex: 2;
+    padding: 10px;
+}

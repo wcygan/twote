@@ -1,45 +1,48 @@
-import {ProfileServiceClient} from '../proto/profile_grpc_web_pb.js';
-import {GetProfileRequest} from '../proto/profile_pb.js';
+import {ProfilePageServiceClient} from '../proto/frontend/profile_page_grpc_web_pb.js';
+import {GetProfilePageRequest} from '../proto/frontend/profile_page_pb.js';
 import {authOptions} from "../middleware/AuthInterceptor";
 import React, {useEffect, useState} from "react";
 import {useParams} from 'react-router-dom';
+import Profile from "../content/Profile";
+import Tweet from "../content/Tweet";
 
 const ProfilePage = () => {
-    const [userId, setUserId] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [joinedAt, setJoinedAt] = useState('');
-    const [bio, setBio] = useState('');
-
     const { id } = useParams();
+
+    const [profile, setProfile] = useState(null);
+    const [tweets, setTweets] = useState([]);
 
     useEffect(() => {
         const client =
-            new ProfileServiceClient("http://localhost:8080", null, authOptions);
+            new ProfilePageServiceClient("http://localhost:8080", null, authOptions);
 
-        const request = new GetProfileRequest();
+        const request = new GetProfilePageRequest();
         request.setUserId(id);
 
-        client.get(request, {}, (err, response) => {
+        client.getProfilePage(request, {}, (err, response) => {
             if (err) {
                 console.error(err);
-                return;
+            } else {
+                setProfile(response.getProfile());
+                setTweets(response.getTweetsList());
             }
-
-            const date = new Date(response.getJoinedAt().getSeconds() * 1000);
-            setUserId(response.getUserId());
-            setFirstName(response.getFirstName());
-            setLastName(response.getLastName());
-            setBio(response.getBiography());
-            setJoinedAt(date.toDateString());
         });
     }, []);
 
     return <div>
-        Your content here
-        <p>{firstName} {lastName}</p>
-        <p>Joined at: {joinedAt}</p>
-        <p>Bio: {bio}</p>
+        {profile && <>
+            <Profile
+                profile={profile}
+            />
+        </>}
+        <div>
+            {tweets.map((tweet, index) => (
+                <Tweet
+                    key={index}
+                    tweet={tweet}
+                />
+            ))}
+        </div>
     </div>;
 };
 

@@ -1,6 +1,7 @@
 use common::db::mongo::{collect_deserialize, MongoCollection, MongoDB};
 use mongodb::bson;
 use mongodb::bson::doc;
+use mongodb::options::FindOptions;
 use std::time::Instant;
 use tonic::{Request, Response, Status};
 use tracing::info;
@@ -77,7 +78,9 @@ impl ProfileService for ProfileServiceImpl {
                         "$in": user_ids,
                     },
                 },
-                None,
+                FindOptions::builder()
+                    .sort(doc! { "joined_at": -1 })
+                    .build(),
             )
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
@@ -100,7 +103,12 @@ impl ProfileService for ProfileServiceImpl {
             .client
             .database(MongoDB::Profiles.name())
             .collection(MongoCollection::Profiles.name())
-            .find(None, None)
+            .find(
+                None,
+                FindOptions::builder()
+                    .sort(doc! { "joined_at": -1 })
+                    .build(),
+            )
             .await
             .map_err(|_| Status::internal("Failed to get profiles"))?;
 

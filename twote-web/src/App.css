@@ -1,3 +1,9 @@
+.Middle-Section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 .App {
   text-align: center;
 }

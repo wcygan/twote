@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CreateAccountRequest } from '../proto/account_pb.js';
-import { AccountServiceClient } from '../proto/account_grpc_web_pb.js';
+import { CreateAccountRequest } from '../proto/backend/account_pb.js';
+import { AccountServiceClient } from '../proto/backend/account_grpc_web_pb.js';
 import {Button} from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 
