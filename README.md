@@ -4,6 +4,9 @@
 
 A social media app where users can post messages and follow other users.
 
+![Architecture](resources/twote-architecture.png)
+
+
 ## Local Setup
 
 See [SETUP.md](documentation/SETUP.md) for instructions on how to set up the project on your local machine.
